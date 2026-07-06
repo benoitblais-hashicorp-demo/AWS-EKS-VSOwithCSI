@@ -15,6 +15,6 @@ resource "vault_generic_secret" "credentials" {
   path      = "${vault_mount.credentials.path}/app/config"
   data_json = jsonencode({
     message   = "Try VSO by changing this text from Vault!"
-    image_url = "/resources/logo.png"
+    image_url = "https://avatars.githubusercontent.com/u/320148?v=4"
   })
 }
