@@ -14,7 +14,8 @@ metadata:
   name: csi-secret
   namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
 spec:
-  accessControl: {}
+  accessControl:
+    serviceAccountPattern: "vault-auth"
   vaultAuthRef:
     name: default
     namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
