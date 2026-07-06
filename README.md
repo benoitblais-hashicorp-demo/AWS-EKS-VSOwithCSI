@@ -370,12 +370,21 @@ Type: `bool`
 
 Default: `false`
 
+### <a name="input_uptycs_tags"></a> [uptycs\_tags](#input\_uptycs\_tags)
+
+Description: (Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER format.
+
+Type: `string`
+
+Default: `"DEMO/CCODE/UT/SEC"`
+
 ## Resources
 
 The following resources are used by this module:
 
 - [aws_eip.nginx_ingress](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/eip) (resource)
 - [helm_release.nginx_ingress](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
+- [helm_release.uptycs_edr](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.vault_secrets_operator](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [kubernetes_cluster_role_binding_v1.vault](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/cluster_role_binding_v1) (resource)
 - [kubernetes_deployment_v1.static_app](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/deployment_v1) (resource)
@@ -383,6 +392,7 @@ The following resources are used by this module:
 - [kubernetes_manifest.vault_auth](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/manifest) (resource)
 - [kubernetes_manifest.vault_connection](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/manifest) (resource)
 - [kubernetes_manifest.vault_csi_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/manifest) (resource)
+- [kubernetes_namespace_v1.edr](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/namespace_v1) (resource)
 - [kubernetes_namespace_v1.simple_app](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/namespace_v1) (resource)
 - [kubernetes_secret_v1.vault_token](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/secret_v1) (resource)
 - [kubernetes_service_account_v1.vault](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/service_account_v1) (resource)
