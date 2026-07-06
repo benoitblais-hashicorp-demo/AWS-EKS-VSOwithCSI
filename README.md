@@ -137,22 +137,22 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 
 ### Observe the behavior
 
-6. Reload the demo web application — the **original message is still displayed**. This is expected:
+1. Reload the demo web application — the **original message is still displayed**. This is expected:
    the CSI volume is bound to the pod at startup and is not live-reloaded while the pod is running.
    Vault still holds the updated secret, but the running pod retains the prior version in its
    ephemeral volume.
 
 ### Apply the rotation to running pods
 
-7. Trigger a rolling restart of the deployment:
+1. Trigger a rolling restart of the deployment:
 
    ```bash
    kubectl rollout restart deployment/static-secrets -n simple-app
    ```
 
-8. As each pod is replaced, the VSO CSI driver re-authenticates to Vault, reads the current
+2. As each pod is replaced, the VSO CSI driver re-authenticates to Vault, reads the current
    secret version, and injects the new data into the replacement pod's ephemeral volume.
-9. Reload the demo web application — the **new message from Vault is now displayed**.
+3. Reload the demo web application — the **new message from Vault is now displayed**.
 
 ### What this demonstrates
 
@@ -277,13 +277,9 @@ The following requirements are needed by this module:
 
 - <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) (3.0.1)
 
-- <a name="requirement_null"></a> [null](#requirement\_null) (3.2.4)
-
 - <a name="requirement_random"></a> [random](#requirement\_random) (3.8.1)
 
 - <a name="requirement_time"></a> [time](#requirement\_time) (0.13.1)
-
-- <a name="requirement_tls"></a> [tls](#requirement\_tls) (4.2.1)
 
 - <a name="requirement_vault"></a> [vault](#requirement\_vault) (5.8.0)
 
