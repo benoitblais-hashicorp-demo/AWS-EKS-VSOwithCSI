@@ -34,4 +34,3 @@ This project leverages standard Terraform configurations and uses HCP Terraform 
 * Access secrets securely via workspace variables. Set `sensitive = true` for sensitive variables across all definitions.
 
 If you find a security vulnerability, please refer to our `SECURITY.md` for reporting procedures.
-
