@@ -93,3 +93,15 @@ variable "uptycs_tags" {
   type        = string
   default     = "UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
 }
+
+variable "public_hosted_zone" {
+  description = "(Optional) The Route 53 public hosted zone name (e.g., 'example.com') where DNS validation and A records will be published. If set, an ACM certificate will be provisioned directly on the NGINX Network Load Balancer."
+  type        = string
+  default     = ""
+}
+
+variable "demo_subdomain" {
+  description = "(Optional) The subdomain to prepend to the public_hosted_zone for the application (e.g., 'vso-demo')."
+  type        = string
+  default     = "vso-demo"
+}

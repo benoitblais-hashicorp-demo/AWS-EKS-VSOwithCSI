@@ -58,8 +58,11 @@ resource "helm_release" "nginx_ingress" {
   values = [<<-EOT
 controller:
   service:
+    ${var.public_hosted_zone != "" ? "targetPorts:\n      https: http" : ""}
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+      ${var.public_hosted_zone != "" ? format("service.beta.kubernetes.io/aws-load-balancer-ssl-cert: \"%s\"", try(aws_acm_certificate_validation.public[0].certificate_arn, "")) : "# TLS disabled"}
+      ${var.public_hosted_zone != "" ? "service.beta.kubernetes.io/aws-load-balancer-ssl-ports: \"https\"" : ""}
       service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: true
       service.beta.kubernetes.io/aws-load-balancer-eip-allocations: ${aws_eip.nginx_ingress[0].id},${aws_eip.nginx_ingress[1].id},${aws_eip.nginx_ingress[2].id}
       service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
