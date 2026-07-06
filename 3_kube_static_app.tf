@@ -66,7 +66,7 @@ resource "kubernetes_deployment_v1" "static_app" {
           app = "static-secrets"
         }
         annotations = {
-          "kubectl.kubernetes.io/restartedAt" = "2026-07-06T02:00:00Z"
+          "kubectl.kubernetes.io/restartedAt" = var.static_app_rollout_token != "" ? var.static_app_rollout_token : "initial-deploy"
         }
       }
 
