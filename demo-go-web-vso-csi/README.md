@@ -7,21 +7,21 @@ This folder vendors the source code for the VSO static-secret demo web applicati
 From this folder:
 
 ```bash
-docker build -t <your-registry>/<your-image>:<tag> -f build/Dockerfile .
+podman build -t <your-registry>/<your-image>:<tag> -f build/Dockerfile .
 ```
 
 Example (GitHub Container Registry):
 
 ```bash
-docker build -t ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0 -f build/Dockerfile .
+podman build -t ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0 -f build/Dockerfile .
 ```
 
 ## Push image
 
-Ensure you are logged into the registry first (e.g. `docker login ghcr.io -u <username> -p <token>`), then:
+Ensure you are logged into the registry first (e.g. `podman login ghcr.io -u <username> -p <token>`), then:
 
 ```bash
-docker push ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0
+podman push ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0
 ```
 
 ## Use image in Terraform
