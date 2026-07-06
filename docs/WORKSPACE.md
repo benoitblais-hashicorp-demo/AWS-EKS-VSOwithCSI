@@ -13,7 +13,6 @@ Set these in the workspace under **Variables → Terraform variables**.
 
 | Variable | Example value | Sensitive | Description |
 | --- | --- | --- | --- |
-| `doormat_username` | `firstname.lastname_company` | No | Doormat username used to construct the IAM developer role ARN (`arn:aws:iam::<account_id>:role/aws_<doormat_username>-developer`). Used for EKS cluster access and KMS key administration. |
 | `vault_address` | `https://vault-cluster.example.com:8200` | No | Full URL of the HashiCorp Vault cluster used by the Vault provider and the Vault Secrets Operator Helm chart. |
 
 ### Optional
@@ -21,6 +20,7 @@ Set these in the workspace under **Variables → Terraform variables**.
 | Variable | Default | Sensitive | Description |
 | --- | --- | --- | --- |
 | `customer_name` | `""` | No | Short name for the customer. Used to prefix all provisioned resources. Lowercase letters, numbers, and hyphens only, 50 characters maximum. |
+| `doormat_username` | `""` | No | Doormat username used to construct the IAM developer role ARN (`arn:aws:iam::<account_id>:role/aws_<doormat_username>-developer`). When set, adds the role as a KMS key administrator and EKS access entry. Leave empty to omit. |
 | `instance_type` | `t3.medium` | No | EC2 instance type for the EKS managed node group. Allowed values: `t3.medium`, `t3.large`, `t3.xlarge`, `m6i.large`, `m6i.xlarge`, `m6a.large`, `m6a.xlarge`. |
 | `region` | `ca-central-1` | No | AWS region where all resources are provisioned. |
 | `step_2` | `false` | No | Set to `true` after Step 1 completes. Deploys Kubernetes tooling, Vault Secrets Operator, and Vault Kubernetes auth. |
