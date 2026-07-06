@@ -46,5 +46,5 @@ jobs:
           VALIDATE_MARKDOWN: true
           VALIDATE_TERRAFORM_TFLINT: true
           VALIDATE_YAML: true
-          # Exclude SKILL.md files from markdown linting
-          FILTER_REGEX_EXCLUDE: .*SKILL\.md$
+          # Exclude SKILL.md files and README.md from markdown linting
+          FILTER_REGEX_EXCLUDE: (.*SKILL\.md$|.*README\.md$)
