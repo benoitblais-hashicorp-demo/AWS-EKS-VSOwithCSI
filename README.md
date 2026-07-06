@@ -353,6 +353,14 @@ Type: `string`
 
 Default: `""`
 
+### <a name="input_demo_subdomain"></a> [demo\_subdomain](#input\_demo\_subdomain)
+
+Description: (Optional) The subdomain to prepend to the public\_hosted\_zone for the application (e.g., 'vso-demo').
+
+Type: `string`
+
+Default: `"vso-demo"`
+
 ### <a name="input_doormat_username"></a> [doormat\_username](#input\_doormat\_username)
 
 Description: (Optional) Doormat username used to construct the IAM developer role ARN for EKS cluster access and KMS key administration (e.g. firstname.lastname\_company). Leave empty to skip adding the doormat role as a KMS key administrator and EKS access entry.
@@ -368,6 +376,14 @@ Description: (Optional) EC2 instance type for the EKS managed node group.
 Type: `string`
 
 Default: `"t3.medium"`
+
+### <a name="input_public_hosted_zone"></a> [public\_hosted\_zone](#input\_public\_hosted\_zone)
+
+Description: (Optional) The Route 53 public hosted zone name (e.g., 'example.com') where DNS validation and A records will be published. If set, an ACM certificate will be provisioned directly on the NGINX Network Load Balancer.
+
+Type: `string`
+
+Default: `""`
 
 ### <a name="input_region"></a> [region](#input\_region)
 
@@ -413,7 +429,11 @@ Default: `"UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
 
 The following resources are used by this module:
 
+- [aws_acm_certificate.public](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/acm_certificate) (resource)
+- [aws_acm_certificate_validation.public](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/acm_certificate_validation) (resource)
 - [aws_eip.nginx_ingress](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/eip) (resource)
+- [aws_route53_record.public_validation](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/route53_record) (resource)
+- [aws_route53_record.web_dns_record](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/route53_record) (resource)
 - [helm_release.nginx_ingress](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.uptycs_edr](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.vault_secrets_operator](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
@@ -445,6 +465,7 @@ The following resources are used by this module:
 - [aws_ec2_instance_type_offerings.supported](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/ec2_instance_type_offerings) (data source)
 - [aws_iam_session_context.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/iam_session_context) (data source)
 - [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/partition) (data source)
+- [aws_route53_zone.demo](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/route53_zone) (data source)
 
 ## Outputs
 
