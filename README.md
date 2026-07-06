@@ -359,7 +359,7 @@ Description: (Optional) The subdomain to prepend to the public\_hosted\_zone for
 
 Type: `string`
 
-Default: `"vso-demo"`
+Default: `"vsocsi-demo"`
 
 ### <a name="input_doormat_username"></a> [doormat\_username](#input\_doormat\_username)
 
@@ -383,7 +383,7 @@ Description: (Optional) The Route 53 public hosted zone name (e.g., 'example.com
 
 Type: `string`
 
-Default: `""`
+Default: `"benoit-blais.sbx.hashidemos.io"`
 
 ### <a name="input_region"></a> [region](#input\_region)
 
