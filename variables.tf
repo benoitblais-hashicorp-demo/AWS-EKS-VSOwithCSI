@@ -70,6 +70,12 @@ variable "region" {
   }
 }
 
+variable "static_app_rollout_token" {
+  description = "(Optional) Change this value to force a rollout restart of the Step 3 demo deployment. Example: 2026-07-06T15:30:00Z"
+  type        = string
+  default     = ""
+}
+
 variable "step_2" {
   description = "(Optional) Set to true after Step 1 completes successfully. Deploys Kubernetes tooling: nginx ingress, Vault Secrets Operator, Vault Kubernetes auth backend, and RBAC resources."
   type        = bool
