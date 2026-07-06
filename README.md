@@ -376,7 +376,7 @@ Description: (Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER for
 
 Type: `string`
 
-Default: `"DEMO/CCODE/UT/SEC"`
+Default: `"UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"`
 
 ## Resources
 
@@ -393,6 +393,7 @@ The following resources are used by this module:
 - [kubernetes_manifest.vault_connection](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/manifest) (resource)
 - [kubernetes_manifest.vault_csi_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/manifest) (resource)
 - [kubernetes_namespace_v1.edr](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/namespace_v1) (resource)
+- [kubernetes_namespace_v1.ingress_nginx](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/namespace_v1) (resource)
 - [kubernetes_namespace_v1.simple_app](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/namespace_v1) (resource)
 - [kubernetes_secret_v1.vault_token](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/secret_v1) (resource)
 - [kubernetes_service_account_v1.vault](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/service_account_v1) (resource)

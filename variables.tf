@@ -91,5 +91,5 @@ variable "step_3" {
 variable "uptycs_tags" {
   description = "(Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER format."
   type        = string
-  default     = "DEMO/CCODE/UT/SEC"
+  default     = "UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
 }

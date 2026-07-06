@@ -31,15 +31,16 @@ This document describes the technical architecture, design decisions, and operat
                         │ step_2
           ┌─────────────▼─────────────────────────┐
           │          Kubernetes (EKS)               │
-          │  namespace: simple-app                  │
-          │  ┌──────────────────────────────────┐  │
-          │  │  helm: ingress-nginx (NLB + EIP)  │  │
-          │  │  helm: vault-secrets-operator     │  │
-          │  │    └─ CSI provider enabled         │  │
-          │  │  ServiceAccount: vault-auth        │  │
-          │  │  ClusterRoleBinding: token-review  │  │
-          │  └──────────────────────────────────┘  │
-          └──────────────────────────────────────── ┘
+          │  namespaces: simple-app, ingress-nginx, uptycs │
+          │  ┌─────────────────────────────────────────┐  │
+          │  │  helm: ingress-nginx (NLB + EIP)        │  │
+          │  │  helm: k8sosquery (Uptycs EDR)          │  │
+          │  │  helm: vault-secrets-operator           │  │
+          │  │    └─ CSI provider enabled               │  │
+          │  │  ServiceAccount: vault-auth              │  │
+          │  │  ClusterRoleBinding: token-review        │  │
+          │  └─────────────────────────────────────────┘  │
+          └───────────────────────────────────────────── ┘
                         │ step_3
           ┌─────────────▼─────────────────────────────────────────┐
           │          Kubernetes (EKS) — Application Layer           │
@@ -88,9 +89,10 @@ Resources provisioned:
 
 | Resource | Description |
 | --- | --- |
-| `kubernetes_namespace_v1.simple_app` | Dedicated namespace `simple-app` |
+| `kubernetes_namespace_v1.simple_app` | Dedicated namespaces (`simple-app`, `ingress-nginx`, `uptycs`) with PSS compliance |
 | `aws_eip.nginx_ingress` | 3 Elastic IPs for the Network Load Balancer |
 | `helm_release.nginx_ingress` | Nginx ingress controller (internet-facing NLB) |
+| `helm_release.uptycs_edr` | IBM Uptycs EDR agent (k8sosquery Helm chart) |
 | `helm_release.vault_secrets_operator` | VSO Helm chart v1.3.0 with CSI driver enabled |
 | `kubernetes_service_account_v1.vault` | Service account `vault-auth` for Vault authentication |
 | `kubernetes_secret_v1.vault_token` | Long-lived service account token for Vault token reviewer |
