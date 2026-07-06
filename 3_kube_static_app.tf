@@ -15,7 +15,9 @@ metadata:
   namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
 spec:
   accessControl:
-    serviceAccountPattern: "*"
+    serviceAccountPattern: "${kubernetes_service_account_v1.vault[0].metadata.0.name}"
+    namespacePatterns:
+      - "^${kubernetes_namespace_v1.simple_app[0].metadata.0.name}$"
   vaultAuthRef:
     name: default
     namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
