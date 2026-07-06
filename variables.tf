@@ -46,6 +46,12 @@ variable "demo_subdomain" {
   default     = "vsocsi-demo"
 }
 
+variable "demo_webapp_image" {
+  description = "(Optional) The container image reference for the demo web application."
+  type        = string
+  default     = "ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0"
+}
+
 variable "instance_type" {
   description = "(Optional) EC2 instance type for the EKS managed node group."
   type        = string
@@ -104,10 +110,4 @@ variable "uptycs_tags" {
   description = "(Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER format."
   type        = string
   default     = "UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
-}
-
-variable "demo_webapp_image" {
-  description = "(Optional) The container image reference for the demo web application."
-  type        = string
-  default     = "ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0"
 }
