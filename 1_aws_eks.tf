@@ -35,10 +35,12 @@ module "eks" {
       }
     }
   } : {}
-  kms_key_administrators = compact([
+  kms_key_administrators = local.extra_doormat_role != null ? [
     local.extra_doormat_role,
     data.aws_iam_session_context.current.issuer_arn,
-  ])
+  ] : [
+    data.aws_iam_session_context.current.issuer_arn,
+  ]
   addons = {
     coredns = {
       before_compute = true
