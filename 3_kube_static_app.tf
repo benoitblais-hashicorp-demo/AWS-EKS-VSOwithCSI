@@ -64,7 +64,7 @@ resource "kubernetes_deployment_v1" "static_app" {
           app = "static-secrets"
         }
         annotations = {
-          "kubectl.kubernetes.io/restartedAt" = "2026-07-06T01:00:00Z"
+          "kubectl.kubernetes.io/restartedAt" = "2026-07-06T02:00:00Z"
         }
       }
 
@@ -124,6 +124,19 @@ resource "kubernetes_deployment_v1" "static_app" {
             driver    = "csi.vso.hashicorp.com"
             volume_attributes = {
               csiSecretsName = "csi-secret"
+            }
+          }
+        }
+
+        volume {
+          name = "vault-token"
+          projected {
+            sources {
+              service_account_token {
+                audience           = "vault"
+                expiration_seconds = 7200
+                path               = "vault-token"
+              }
             }
           }
         }
