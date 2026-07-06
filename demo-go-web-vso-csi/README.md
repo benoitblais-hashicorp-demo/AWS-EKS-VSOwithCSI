@@ -10,24 +10,26 @@ From this folder:
 docker build -t <your-registry>/<your-image>:<tag> -f build/Dockerfile .
 ```
 
-Example:
+Example (GitHub Container Registry):
 
 ```bash
-docker build -t 353671346900.dkr.ecr.ca-central-1.amazonaws.com/demo-go-web:v1.1.0 -f build/Dockerfile .
+docker build -t ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0 -f build/Dockerfile .
 ```
 
 ## Push image
 
+Ensure you are logged into the registry first (e.g. `docker login ghcr.io -u <username> -p <token>`), then:
+
 ```bash
-docker push <your-registry>/<your-image>:<tag>
+docker push ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0
 ```
 
-## Use image in Terraform Stacks
+## Use image in Terraform
 
-Set stack variable `demo_webapp_image` to your pushed image reference.
+Set the `demo_webapp_image` variable in your workspace to point to your new image.
 
 Example:
 
 ```hcl
-demo_webapp_image = "353671346900.dkr.ecr.ca-central-1.amazonaws.com/demo-go-web:v1.1.0"
+demo_webapp_image = "ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0"
 ```

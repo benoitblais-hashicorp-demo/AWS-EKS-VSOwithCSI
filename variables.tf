@@ -105,3 +105,9 @@ variable "uptycs_tags" {
   type        = string
   default     = "UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
 }
+
+variable "demo_webapp_image" {
+  description = "(Optional) The container image reference for the demo web application."
+  type        = string
+  default     = "ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0"
+}
