@@ -1,5 +1,10 @@
 # Copyright IBM Corp. 2024, 2026
 
+import {
+  to = kubernetes_deployment_v1.static_app[0]
+  id = "simple-app/static-secrets"
+}
+
 resource "kubernetes_manifest" "vault_csi_secret" {
   count = var.step_3 ? 1 : 0
   depends_on = [
