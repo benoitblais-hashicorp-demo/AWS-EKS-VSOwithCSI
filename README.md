@@ -361,6 +361,14 @@ Type: `string`
 
 Default: `"vsocsi-demo"`
 
+### <a name="input_demo_webapp_image"></a> [demo\_webapp\_image](#input\_demo\_webapp\_image)
+
+Description: (Optional) The container image reference for the demo web application.
+
+Type: `string`
+
+Default: `"ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0"`
+
 ### <a name="input_doormat_username"></a> [doormat\_username](#input\_doormat\_username)
 
 Description: (Optional) Doormat username used to construct the IAM developer role ARN for EKS cluster access and KMS key administration (e.g. firstname.lastname\_company). Leave empty to skip adding the doormat role as a KMS key administrator and EKS access entry.
