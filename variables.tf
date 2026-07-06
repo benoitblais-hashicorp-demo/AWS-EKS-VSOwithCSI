@@ -87,3 +87,9 @@ variable "step_3" {
   type        = bool
   default     = false
 }
+
+variable "uptycs_tags" {
+  description = "(Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER format."
+  type        = string
+  default     = "DEMO/CCODE/UT/SEC"
+}

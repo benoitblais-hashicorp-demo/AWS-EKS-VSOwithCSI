@@ -22,7 +22,7 @@ spec:
   vaultAuthRef:
     name: default
     namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
-    trustNamespace: false
+    trustNamespace: true
   secrets:
     vaultStaticSecrets:
       - mount: ${vault_mount.credentials.path}
@@ -126,23 +126,12 @@ resource "kubernetes_deployment_v1" "static_app" {
             read_only = true
             driver    = "csi.vso.hashicorp.com"
             volume_attributes = {
-              csiSecretsName = "csi-secret"
+              csiSecretsName      = "csi-secret"
+              csiSecretsNamespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
             }
           }
         }
 
-        volume {
-          name = "vault-token"
-          projected {
-            sources {
-              service_account_token {
-                audience           = "vault"
-                expiration_seconds = 7200
-                path               = "vault-token"
-              }
-            }
-          }
-        }
 
       }
     }
