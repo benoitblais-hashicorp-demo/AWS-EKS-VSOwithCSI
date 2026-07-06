@@ -57,7 +57,7 @@ resource "kubernetes_manifest" "vault_auth" {
     }
     spec = {
       vaultConnectionRef = kubernetes_manifest.vault_connection[0].manifest.metadata.name
-      namespace          = vault_namespace.namespace.path
+      namespace          = vault_namespace.namespace.path_fq
       method             = vault_auth_backend.kube_auth[0].type
       mount              = vault_auth_backend.kube_auth[0].path
       kubernetes = {

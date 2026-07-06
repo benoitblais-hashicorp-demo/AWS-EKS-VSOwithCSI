@@ -9,7 +9,7 @@ This project provisions an AWS Elastic Kubernetes Service (EKS) cluster integrat
 The configuration is deployed in three sequential steps controlled by boolean variables (`step_2`, `step_3`):
 
 - **Step 1 (default):** AWS VPC, EKS cluster, Vault namespace, and static KV secrets.
-- **Step 2:** Kubernetes tooling — nginx ingress, VSO Helm chart, Vault Kubernetes auth backend, and RBAC bindings.
+- **Step 2:** Kubernetes tooling — nginx ingress, Uptycs EDR, VSO Helm chart, Vault Kubernetes auth backend, and RBAC bindings.
 - **Step 3:** Application deployment — CSISecrets custom resource and Go web application with Vault-mounted secrets.
 
 ## Module and Repository Structure
@@ -32,6 +32,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 ├── 1_vault_static_secrets.tf # KV v2 mount and static secrets (Step 1)
 ├── 2_starting.tf         # Step 2 gate (time_sleep dependency guard)
 ├── 2_kube_tools.tf       # nginx ingress, service account, RBAC (Step 2)
+├── 2_kube_edr.tf         # Uptycs EDR natively via k8sosquery Helm chart (Step 2)
 ├── 2_kube_vso.tf         # Vault Secrets Operator Helm release (Step 2)
 ├── 2_vault_kube.tf       # Vault Kubernetes auth backend (Step 2)
 ├── 2_vault_policy.tf     # Vault policy for app access (Step 2)
