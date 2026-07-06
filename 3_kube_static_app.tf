@@ -17,13 +17,12 @@ metadata:
 spec:
   namespace: ${vault_namespace.namespace.path_fq}
   accessControl:
-    serviceAccountPattern: "${kubernetes_service_account_v1.vault[0].metadata.0.name}"
+    serviceAccountPattern: ".*"
     namespacePatterns:
-      - "^${kubernetes_namespace_v1.simple_app[0].metadata.0.name}$"
+      - ".*"
   vaultAuthRef:
     name: default
     namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
-    trustNamespace: true
   secrets:
     vaultStaticSecrets:
       - mount: ${vault_mount.credentials.path}
