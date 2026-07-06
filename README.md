@@ -282,6 +282,19 @@ Do not set `VAULT_TOKEN` when using this model.
 The workspace is driven by a VCS connection. No manual `terraform init` or `terraform apply`
 is required. Workspace variables are used for all provider credentials.
 
+## Setup & Deployment
+
+1. Set up an HCP Terraform Workspace connected to your VCS repository.
+2. Configure the required workspace variables and HCP Terraform dynamic credentials (for AWS and Vault) as described in `docs/WORKSPACE.md`.
+3. **Step 1:** Queue a run with `step_2 = false` and `step_3 = false`. This provisions the foundational AWS infrastructure and the Vault namespace.
+4. **Step 2:** Update your workspace variables to set `step_2 = true`. To prevent parallel dependency failures, apply this step on its own to deploy the Kubernetes tooling (Nginx ingress, Uptycs EDR, VSO Helm Chart, Vault Auth).
+5. **Step 3:** Finally, set `step_3 = true` and queue the final run. This deploys the CSISecrets resource and the target application pods.
+
+## Troubleshooting & Known Issues
+
+- **Vault Enterprise Validation Errors:** The VSO CSI driver requires Vault Enterprise to function and hard-validates this requirement by querying the `/sys/license/status` endpoint. If your pod's Vault policy does not grant `read` capability to this endpoint, the volume mount will throw a `vault enterprise client validation failed` error, completely blocking Pod scheduling.
+- **Vault 403 Permission Denied during Token Review:** When mapping the Vault Kubernetes Auth backend inside an HCP Vault dedicated namespace, ensure that the `VaultAuth` custom resource refers to the Vault namespace using the **Namespace ID** instead of the FQDN path. Using the full namespace path generates a 403 error due to token evaluation logic.
+
 ## Documentation
 
 ## Requirements
