@@ -37,7 +37,8 @@ EOF
 }
 
 resource "kubernetes_deployment_v1" "static_app" {
-  count = var.step_3 ? 1 : 0
+  count            = var.step_3 ? 1 : 0
+  wait_for_rollout = false
   depends_on = [
     time_sleep.step_3,
     kubernetes_manifest.vault_csi_secret,
@@ -66,6 +67,9 @@ resource "kubernetes_deployment_v1" "static_app" {
       metadata {
         labels = {
           app = "static-secrets"
+        }
+        annotations = {
+          "kubectl.kubernetes.io/restartedAt" = "2026-07-06T00:00:00Z"
         }
       }
 
