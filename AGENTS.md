@@ -4,21 +4,39 @@ This file provides instructions for AI coding agents working on this Terraform P
 
 ## Project Overview
 
-This project provisions an AWS Elastic Kubernetes Service (EKS) cluster integrated with Vault Secrets Operator (VSO) and the Secrets Store CSI driver using Terraform.
+This project provisions an AWS Elastic Kubernetes Service (EKS) cluster integrated with Vault Secrets Operator (VSO) and the Secrets Store CSI driver using Terraform. It demonstrates how Vault secrets can be securely delivered directly into Kubernetes pods via CSI volume mounts without ever being stored as Kubernetes Secrets.
+
+The configuration is deployed in three sequential steps controlled by boolean variables (`step_2`, `step_3`):
+- **Step 1 (default):** AWS VPC, EKS cluster, Vault namespace, and static KV secrets.
+- **Step 2:** Kubernetes tooling — nginx ingress, VSO Helm chart, Vault Kubernetes auth backend, and RBAC bindings.
+- **Step 3:** Application deployment — CSISecrets custom resource and Go web application with Vault-mounted secrets.
 
 ## Module and Repository Structure
 
-Organize your Terraform project as follows:
+This project uses a numbered file naming convention to reflect the three deployment steps:
 
 ```text
 ├── .gitignore
 ├── LICENSE
 ├── README.md
-├── main.tf
-├── outputs.tf
-├── providers.tf
-├── variables.tf
-├── versions.tf
+├── terraform.tf          # Terraform version and provider requirements
+├── outputs.tf            # Output value definitions (alphabetical order)
+├── providers.tf          # Provider configurations
+├── variables.tf          # Input variable definitions (alphabetical order)
+├── variables_providers.tf # Dynamic credential variables (currently commented out)
+├── 1_locals.tf           # Local values and AZ discovery (Step 1)
+├── 1_aws_network.tf      # VPC and subnet provisioning (Step 1)
+├── 1_aws_eks.tf          # EKS cluster and node groups (Step 1)
+├── 1_vault_ns.tf         # Vault namespace creation (Step 1)
+├── 1_vault_static_secrets.tf # KV v2 mount and static secrets (Step 1)
+├── 2_starting.tf         # Step 2 gate (time_sleep dependency guard)
+├── 2_kube_tools.tf       # nginx ingress, service account, RBAC (Step 2)
+├── 2_kube_vso.tf         # Vault Secrets Operator Helm release (Step 2)
+├── 2_vault_kube.tf       # Vault Kubernetes auth backend (Step 2)
+├── 2_vault_policy.tf     # Vault policy for app access (Step 2)
+├── 3_starting.tf         # Step 3 gate (time_sleep dependency guard)
+├── 3_kube_ingress.tf     # Kubernetes ingress rule (Step 3)
+├── 3_kube_static_app.tf  # CSISecrets CRD, deployment, service (Step 3)
 ├── docs/
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
@@ -26,18 +44,22 @@ Organize your Terraform project as follows:
 │   ├── README_footer.md
 │   ├── README_header.md
 │   ├── SECURITY.md
+│   ├── SPECIFICATION.md  # Technical architecture and design decisions
+│   └── WORKSPACE.md      # HCP Terraform workspace variable/auth configuration
 ```
 
 ### Required Files and Directories
 
-- `README.md` – Required in the root module. Generated automatically (e.g., via Terraform-Docs). Do not edit manually.
-- `docs/README_header.md` - Describe the purpose of the code and provide required context.
-- `docs/README_footer.md` - Provide links to external documentation used to generate the code.
-- `main.tf` – Primary resource and data source definitions.
+- `README.md` – Required in the root module. Generated automatically via terraform-docs CI. Do not edit manually.
+- `docs/README_header.md` – Describe the purpose of the demo, key features, permissions, and authentication.
+- `docs/README_footer.md` – External documentation links used to develop the code.
+- `docs/SPECIFICATION.md` – Technical architecture, design decisions, and demo flow documentation.
+- `docs/WORKSPACE.md` – Required workspace variables and authentication configuration for HCP Terraform.
+- `terraform.tf` – Terraform version and provider requirements (`required_version`, `required_providers`).
+- `providers.tf` – Provider configurations (AWS, Vault, Helm, Kubernetes).
 - `outputs.tf` – Output value definitions (alphabetical order).
-- `providers.tf` – Provider configurations.
 - `variables.tf` – Input variable definitions (alphabetical order with required variables at the top).
-- `versions.tf` - Terraform version and provider requirements.
+- `variables_providers.tf` – Legacy dynamic credential variable definitions kept as reference (workspace JWT/OIDC auth is used directly via environment variables).
 
 ## Tools and Frameworks
 
@@ -85,8 +107,9 @@ Refer to CONTRIBUTING.md for general coding guidelines. HashiCorp's Terraform st
 ## Security and Secrets
 
 - Never commit `.terraform` directories or local state files.
-- The project leverages dynamic provider credentials natively supported by Terraform Cloud / Enterprise workspaces or the VCS workflow.
+- The project uses HCP Terraform native dynamic credentials for AWS and JWT/OIDC workload identity for Vault provider authentication.
 - Access secrets securely via workspace variables.
+- Do not introduce static `VAULT_TOKEN` usage in documentation or examples for normal runs.
 - Set `sensitive = true` for sensitive variables across all definitions.
 
 ## State Management

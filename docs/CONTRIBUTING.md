@@ -1,32 +1,37 @@
 # Contributing
 
-Thank you for your interest in contributing! This repository uses **Terraform** to manage Azure Management Groups. Please review these guidelines before contributing.
+Thank you for your interest in contributing. This repository uses Terraform to provision an AWS EKS cluster integrated with the HashiCorp Vault Secrets Operator (VSO) and the Secrets Store CSI driver. The target architecture delivers Vault secrets directly into Kubernetes pods via CSI volume mounts across three sequential deployment steps. Please review these guidelines before contributing.
 
 ## Architecture Paradigm: HCP Terraform Workspaces
 
 This project leverages standard Terraform configurations and uses HCP Terraform workspaces for remote execution and state management.
 
 * **No Local State or CLI Applies:** Do not run `terraform apply` locally. All pushes to the main branch are evaluated and deployed by HCP Terraform natively via a VCS-driven workflow.
-* **State Management:** Data sharing between distinct configurations relies on standard data sources or `tfe_outputs` where cross-workspace values are required.
+* **State Management:** Data sharing between distinct configurations relies on standard data sources or workspace output patterns where cross-workspace values are required.
 * **Dynamic Credentials:** The project leverages dynamic provider credentials natively supported by Terraform Cloud/Enterprise.
 
 ## Development Workflow
 
 1. **Fork & Branch:** Create a branch for your feature or bug fix.
-2. **Write Code:** Modify the Terraform configurations (`main.tf`, `variables.tf`, etc.) following our styling guidelines.
-3. **Format:** You MUST run `terraform fmt -recursive` before committing. Unformatted code will fail CI/CD checks.
-4. **Open a Pull Request:** Fill out the provided PR template outlining your changes.
+2. **Write Code:** Modify the Terraform configurations following the numbered file naming convention (`1_`, `2_`, `3_` prefixes reflect the deployment step). Follow the styling guidelines in AGENTS.md.
+3. **Preserve Deployment Order:** Changes to Step 1 resources (VPC, EKS, Vault namespace) must not introduce dependencies on Step 2 or Step 3 resources. Keep the `time_sleep` gates and `count = var.step_N ? 1 : 0` pattern intact.
+4. **Preserve Secret Delivery Pattern:** Keep Vault secrets delivered via CSI volume mounts. Do not introduce patterns that create Kubernetes `Secret` objects for application secrets.
+5. **Format:** Formatting checks are enforced by CI/CD. The `terraform.yml` workflow runs `terraform fmt` and pushes fixes automatically on pull requests.
+6. **Open a Pull Request:** Fill out the provided PR template outlining your changes.
 
 ## Code Guidelines
 
 * **Minimalism:** Favor readability and simplicity over highly complex abstractions.
-* **Variable Descriptions:** Every variable must have a clear `description` and `type`.
+* **Variable Descriptions:** Every variable must have a clear `description` and `type`. Prefix descriptions with `(Required)` or `(Optional)`.
 * **Version Constraints:** Use the pessimistic operator (`~>`) for provider and module versions to ensure stability without strict lock-in. Pin the Terraform version using `required_version` in the `terraform` block.
-* **Naming Conventions:** Use `snake_case` for all resource and variable names. Avoid including the resource type in the name (i.e., `azurerm_management_group.core`, not `azurerm_management_group.mg_core`).
+* **Naming Conventions:** Use `snake_case` for all resource and variable names. Avoid including the resource type in the name (i.e., `resource "aws_eks_cluster" "main"`, not `resource "aws_eks_cluster" "eks_main"`).
+* **Outputs:** Keep outputs alphabetical. Use concise factual descriptions without `(Required)`/`(Optional)` prefixes.
 
 ## Security Check
 
 * Never commit `.terraform` folders, `.tfstate` files, or `.tfvars` files containing actual secrets.
+* Never commit Vault tokens, AWS credentials, API keys, or any plaintext credentials.
 * Access secrets securely via workspace variables. Set `sensitive = true` for sensitive variables across all definitions.
 
 If you find a security vulnerability, please refer to our `SECURITY.md` for reporting procedures.
+

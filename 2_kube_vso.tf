@@ -11,10 +11,10 @@ resource "helm_release" "vault_secrets_operator" {
   values = [<<-EOT
   defaultVaultConnection:
     enabled: true
-    address: ${var.ddr_vault_public_endpoint}
+    address: ${var.vault_address}
   defaultAuthMethod:
     enabled: true
-    namespace: ${vault_namespace.namespace.id}
+    namespace: $${vault_namespace.namespace.id}
     allowedNamespaces:
       - ${try(kubernetes_namespace_v1.simple_app[0].metadata.0.name, null)}
     method: ${try(vault_auth_backend.kube_auth[0].type, null)}

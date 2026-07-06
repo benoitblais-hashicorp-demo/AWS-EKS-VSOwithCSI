@@ -1,13 +1,9 @@
 # Copyright IBM Corp. 2024, 2026
 
 provider "vault" {
-  # skip_child_token = true
-  # address          = var.tfc_vault_dynamic_credentials.default.address
-  namespace = "admin/${var.ddr_user_slug}"
-
-  # auth_login_token_file {
-  #   filename = var.tfc_vault_dynamic_credentials.default.token_filename
-  # }
+  address = var.vault_address
+  # Authentication is provided by HCP Terraform workload identity
+  # when TFC_VAULT_PROVIDER_AUTH=true is set at the workspace level.
 }
 
 provider "aws" {
