@@ -5,6 +5,24 @@ resource "kubernetes_namespace_v1" "simple_app" {
   depends_on = [time_sleep.step_2]
   metadata {
     name = "simple-app"
+    labels = {
+      "pod-security.kubernetes.io/enforce" = "privileged"
+      "pod-security.kubernetes.io/audit"   = "privileged"
+      "pod-security.kubernetes.io/warn"    = "privileged"
+    }
+  }
+}
+
+resource "kubernetes_namespace_v1" "ingress_nginx" {
+  count      = var.step_2 ? 1 : 0
+  depends_on = [time_sleep.step_2]
+  metadata {
+    name = "ingress-nginx"
+    labels = {
+      "pod-security.kubernetes.io/enforce" = "privileged"
+      "pod-security.kubernetes.io/audit"   = "privileged"
+      "pod-security.kubernetes.io/warn"    = "privileged"
+    }
   }
 }
 
@@ -30,10 +48,12 @@ resource "helm_release" "nginx_ingress" {
   depends_on = [
     time_sleep.step_2,
     time_sleep.eip_wait,
+    kubernetes_namespace_v1.ingress_nginx,
   ]
   name            = "ingress-nginx"
   repository      = "https://kubernetes.github.io/ingress-nginx"
   chart           = "ingress-nginx"
+  namespace       = kubernetes_namespace_v1.ingress_nginx[0].metadata.0.name
   upgrade_install = true
   values = [<<-EOT
 controller:
