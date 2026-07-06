@@ -15,7 +15,7 @@ metadata:
   name: csi-secret
   namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
 spec:
-  namespace: ${vault_namespace.namespace.path_fq}
+  namespace: ${vault_namespace.namespace.id}
   accessControl:
     serviceAccountPattern: ".*"
     namespacePatterns:
