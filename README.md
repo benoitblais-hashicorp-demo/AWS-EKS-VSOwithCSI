@@ -125,6 +125,24 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 - You must change `step_2` and `step_3` manually at the workspace level.
 - The full demo requires three separate runs in sequence.
 
+### Walkthrough: Explaining the Configuration
+
+Once the application is running, it is helpful to explain how the configuration pieces fit together to enable the CSI integration:
+
+1. **Vault Policy (`2_vault_policy.tf`)**:
+   Show the `apps-policy` in Vault. Explain that this policy grants read-only access strictly to the `creds/*` path where the application's secret resides.
+2. **Kubernetes Auth Method (`2_vault_kube.tf`)**:
+   Explain how Vault is configured to trust the EKS cluster. Show the `simple-app` role in Vault, which ties the `apps-policy` to the specific Kubernetes service account (`vault-auth`) and namespace (`simple-app`), enforcing strict identity mapping.
+3. **Vault Secrets Operator Helm Chart (`2_kube_vso.tf`)**:
+   Highlight the `values.yaml` configuration where the CSI driver is enabled (`csi.enabled: true`) and default Vault connection methods are disabled to enforce explicit authorization via Custom Resources.
+4. **CSISecrets Custom Resource (`3_kube_static_app.tf`)**:
+   Show the developer-facing Kubernetes manifest. Explain how it connects the application to Vault:
+   - Points to the Vault connection and auth method (`vaultAuthRef`).
+   - Specifies the exact secret path to fetch (`vaultStaticSecrets`).
+   - Restricts which pods can mount this secret (`accessControl` with `serviceAccountPattern` and `namespacePatterns`).
+5. **Pod Volume Mount (`3_kube_static_app.tf`)**:
+   Show the deployment specification. The pod utilizes the `csi.vso.hashicorp.com` storage driver for its volume and passes the `csiSecretsName` attribute. This is how Kubernetes natively mounts the ephemeral secret file into the pod without ever creating a traditional Kubernetes `Secret` object.
+
 ## Secret Rotation Demo
 
 This section walks through the deliberate secret rotation pattern that VSO + CSI enables.
