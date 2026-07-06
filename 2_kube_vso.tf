@@ -14,7 +14,7 @@ resource "helm_release" "vault_secrets_operator" {
     address: ${var.vault_address}
   defaultAuthMethod:
     enabled: true
-    namespace: $${vault_namespace.namespace.id}
+    namespace: ${vault_namespace.namespace.path}
     allowedNamespaces:
       - ${try(kubernetes_namespace_v1.simple_app[0].metadata.0.name, null)}
     method: ${try(vault_auth_backend.kube_auth[0].type, null)}
