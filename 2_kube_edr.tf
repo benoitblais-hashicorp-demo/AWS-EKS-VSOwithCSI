@@ -6,10 +6,13 @@ resource "kubernetes_namespace_v1" "edr" {
   metadata {
     name = "uptycs"
     labels = {
-      "app.kubernetes.io/managed-by"   = "terraform"
-      "security.hashicorp.com/cluster" = module.eks.cluster_name
-      "security.hashicorp.com/addons"  = "edr"
-      "security.hashicorp.com/rbac"    = "edr"
+      "app.kubernetes.io/managed-by"       = "terraform"
+      "security.hashicorp.com/cluster"     = module.eks.cluster_name
+      "security.hashicorp.com/addons"      = "edr"
+      "security.hashicorp.com/rbac"        = "edr"
+      "pod-security.kubernetes.io/enforce" = "privileged"
+      "pod-security.kubernetes.io/audit"   = "privileged"
+      "pod-security.kubernetes.io/warn"    = "privileged"
     }
   }
 }
