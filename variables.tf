@@ -15,7 +15,7 @@ variable "doormat_username" {
 }
 
 variable "vault_address" {
-  description = "(Required) Full URL of the HashiCorp Vault cluster (e.g. https://vault.example.com:8200). Used by the Vault provider and the Vault Secrets Operator Helm chart."
+  description = "(Required) Full URL of the HashiCorp Vault cluster (for example `https://vault.example.com:8200`). Used by the Vault provider and the Vault Secrets Operator Helm chart."
   type        = string
 
   validation {

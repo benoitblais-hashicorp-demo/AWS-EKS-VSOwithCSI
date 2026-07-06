@@ -311,7 +311,7 @@ Type: `string`
 
 ### <a name="input_vault_address"></a> [vault\_address](#input\_vault\_address)
 
-Description: (Required) Full URL of the HashiCorp Vault cluster (e.g. https://vault.example.com:8200). Used by the Vault provider and the Vault Secrets Operator Helm chart.
+Description: (Required) Full URL of the HashiCorp Vault cluster (for example `https://vault.example.com:8200`). Used by the Vault provider and the Vault Secrets Operator Helm chart.
 
 Type: `string`
 
