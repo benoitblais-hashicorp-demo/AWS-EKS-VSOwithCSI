@@ -303,12 +303,6 @@ Version: 6.6.0
 
 The following input variables are required:
 
-### <a name="input_doormat_username"></a> [doormat\_username](#input\_doormat\_username)
-
-Description: (Required) Doormat username used to construct the IAM developer role ARN for EKS cluster access and KMS key administration (e.g. firstname.lastname\_company).
-
-Type: `string`
-
 ### <a name="input_vault_address"></a> [vault\_address](#input\_vault\_address)
 
 Description: (Required) Full URL of the HashiCorp Vault cluster (for example `https://vault.example.com:8200`). Used by the Vault provider and the Vault Secrets Operator Helm chart.
@@ -322,6 +316,14 @@ The following input variables are optional (have default values):
 ### <a name="input_customer_name"></a> [customer\_name](#input\_customer\_name)
 
 Description: (Optional) Short name for the customer. Used to prefix and uniquely identify all provisioned resources. Must be lowercase letters, numbers, and hyphens only, 50 characters maximum.
+
+Type: `string`
+
+Default: `""`
+
+### <a name="input_doormat_username"></a> [doormat\_username](#input\_doormat\_username)
+
+Description: (Optional) Doormat username used to construct the IAM developer role ARN for EKS cluster access and KMS key administration (e.g. firstname.lastname\_company). Leave empty to skip adding the doormat role as a KMS key administrator and EKS access entry.
 
 Type: `string`
 
