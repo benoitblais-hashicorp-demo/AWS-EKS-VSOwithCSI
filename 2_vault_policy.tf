@@ -10,5 +10,12 @@ resource "vault_policy" "apps_policy" {
 path "${vault_mount.credentials.path}/*" {
   capabilities = ["create", "read", "update", "patch", "list"]
 }
+
+# Vault Secrets Operator CSI driver actively requires Vault Enterprise.
+# It identifies Vault Enterprise by checking the `/sys/license/status` endpoint
+# using the Pod's authenticated identity. We must grant read access.
+path "sys/license/status" {
+  capabilities = ["read"]
+}
 EOT
 }
