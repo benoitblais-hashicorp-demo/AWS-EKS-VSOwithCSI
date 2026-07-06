@@ -380,6 +380,8 @@ The following resources are used by this module:
 - [kubernetes_cluster_role_binding_v1.vault](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/cluster_role_binding_v1) (resource)
 - [kubernetes_deployment_v1.static_app](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/deployment_v1) (resource)
 - [kubernetes_ingress_v1.apps](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/ingress_v1) (resource)
+- [kubernetes_manifest.vault_auth](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/manifest) (resource)
+- [kubernetes_manifest.vault_connection](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/manifest) (resource)
 - [kubernetes_manifest.vault_csi_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/manifest) (resource)
 - [kubernetes_namespace_v1.simple_app](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/namespace_v1) (resource)
 - [kubernetes_secret_v1.vault_token](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/secret_v1) (resource)
