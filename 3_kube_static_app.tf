@@ -1,10 +1,5 @@
 # Copyright IBM Corp. 2024, 2026
 
-import {
-  to = kubernetes_deployment_v1.static_app[0]
-  id = "simple-app/static-secrets"
-}
-
 resource "kubernetes_manifest" "vault_csi_secret" {
   count = var.step_3 ? 1 : 0
   depends_on = [
@@ -20,7 +15,7 @@ metadata:
   namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
 spec:
   accessControl:
-    serviceAccountPattern: "vault-auth"
+    serviceAccountPattern: "*"
   vaultAuthRef:
     name: default
     namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
@@ -69,11 +64,12 @@ resource "kubernetes_deployment_v1" "static_app" {
           app = "static-secrets"
         }
         annotations = {
-          "kubectl.kubernetes.io/restartedAt" = "2026-07-06T00:00:00Z"
+          "kubectl.kubernetes.io/restartedAt" = "2026-07-06T01:00:00Z"
         }
       }
 
       spec {
+        service_account_name = kubernetes_service_account_v1.vault[0].metadata.0.name
         container {
           name  = "static-secrets"
           image = "drum0r/demo-go-web:v1.1.0"
