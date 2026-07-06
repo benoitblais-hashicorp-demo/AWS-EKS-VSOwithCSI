@@ -1,9 +1,5 @@
 # Copyright IBM Corp. 2024, 2026
 
-locals {
-  static_app_secret_name = "kv-secrets"
-}
-
 resource "kubernetes_manifest" "vault_csi_secret" {
   count = var.step_3 ? 1 : 0
   depends_on = [

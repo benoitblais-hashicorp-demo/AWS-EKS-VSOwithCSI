@@ -12,14 +12,14 @@ Set these in the workspace under **Variables → Terraform variables**.
 ### Required
 
 | Variable | Example value | Sensitive | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `doormat_username` | `firstname.lastname_company` | No | Doormat username used to construct the IAM developer role ARN (`arn:aws:iam::<account_id>:role/aws_<doormat_username>-developer`). Used for EKS cluster access and KMS key administration. |
 | `vault_address` | `https://vault-cluster.example.com:8200` | No | Full URL of the HashiCorp Vault cluster used by the Vault provider and the Vault Secrets Operator Helm chart. |
 
 ### Optional
 
 | Variable | Default | Sensitive | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `customer_name` | `""` | No | Short name for the customer. Used to prefix all provisioned resources. Lowercase letters, numbers, and hyphens only, 50 characters maximum. |
 | `instance_type` | `t3.medium` | No | EC2 instance type for the EKS managed node group. Allowed values: `t3.medium`, `t3.large`, `t3.xlarge`, `m6i.large`, `m6i.xlarge`, `m6a.large`, `m6a.xlarge`. |
 | `region` | `ca-central-1` | No | AWS region where all resources are provisioned. |
@@ -33,7 +33,7 @@ Set these in the workspace under **Variables → Terraform variables**.
 Set these in the workspace under **Variables → Environment variables**.
 
 | Variable | Example value | Sensitive | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `TFC_VAULT_PROVIDER_AUTH` | `true` | No | Enables HCP Terraform workload identity authentication for the Vault provider. |
 | `TFC_VAULT_ADDR` | `https://vault-cluster.example.com:8200` | No | Vault cluster URL used by provider authentication. |
 | `TFC_VAULT_NAMESPACE` | `admin` | No | Root Vault namespace. Required for HCP Vault Dedicated and Vault Enterprise. Omit for Vault Community Edition. |
@@ -51,7 +51,7 @@ relationship. No environment variables are needed for AWS authentication.
 **Option B — Static credentials (fallback only):**
 
 | Variable | Sensitive | Description |
-|---|---|---|
+| --- | --- | --- |
 | `AWS_ACCESS_KEY_ID` | **Yes** | AWS access key ID for a user or assumed role with the required permissions. |
 | `AWS_SECRET_ACCESS_KEY` | **Yes** | Corresponding AWS secret access key. |
 | `AWS_SESSION_TOKEN` | **Yes** | Session token, required when using temporary credentials (STS / assumed role). |
@@ -63,7 +63,7 @@ relationship. No environment variables are needed for AWS authentication.
 Configure all **Required** variables and environment variables before the first apply.
 Then follow the three-step sequence:
 
-```
+```text
 Step 1  →  Apply with step_2 = false, step_3 = false  (default)
            Provisions: VPC, EKS cluster, Vault namespace, KV v2 secret
 
@@ -82,7 +82,8 @@ After Step 3, the `website` output contains the public URL of the demo applicati
 
 The IAM role or user running Terraform needs the following permissions:
 
-**EC2 / VPC**
+### EC2 / VPC
+
 - `ec2:Describe*`, `ec2:CreateVpc`, `ec2:DeleteVpc`, `ec2:CreateSubnet`, `ec2:DeleteSubnet`
 - `ec2:CreateRouteTable`, `ec2:DeleteRouteTable`, `ec2:CreateRoute`, `ec2:DeleteRoute`
 - `ec2:AssociateRouteTable`, `ec2:DisassociateRouteTable`
@@ -93,21 +94,24 @@ The IAM role or user running Terraform needs the following permissions:
 - `ec2:AuthorizeSecurityGroupEgress`, `ec2:RevokeSecurityGroupEgress`
 - `ec2:CreateTags`, `ec2:DeleteTags`
 
-**EKS**
+### EKS
+
 - `eks:CreateCluster`, `eks:DeleteCluster`, `eks:DescribeCluster`, `eks:UpdateClusterConfig`
 - `eks:CreateNodegroup`, `eks:DeleteNodegroup`, `eks:DescribeNodegroup`
 - `eks:CreateAddon`, `eks:DeleteAddon`, `eks:DescribeAddon`
 - `eks:CreateAccessEntry`, `eks:DeleteAccessEntry`, `eks:AssociateAccessPolicy`
 - `eks:TagResource`, `eks:UntagResource`
 
-**IAM**
+### IAM
+
 - `iam:CreateRole`, `iam:DeleteRole`, `iam:GetRole`, `iam:PassRole`
 - `iam:CreatePolicy`, `iam:DeletePolicy`, `iam:GetPolicy`, `iam:GetPolicyVersion`
 - `iam:AttachRolePolicy`, `iam:DetachRolePolicy`
 - `iam:CreateInstanceProfile`, `iam:DeleteInstanceProfile`, `iam:GetInstanceProfile`
 - `iam:AddRoleToInstanceProfile`, `iam:RemoveRoleFromInstanceProfile`
 
-**KMS**
+### KMS
+
 - `kms:CreateKey`, `kms:DescribeKey`, `kms:CreateAlias`, `kms:DeleteAlias`
 - `kms:EnableKeyRotation`, `kms:GetKeyPolicy`, `kms:PutKeyPolicy`, `kms:ScheduleKeyDeletion`
 

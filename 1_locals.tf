@@ -8,7 +8,6 @@ locals {
   global_id        = lower(substr(base64encode(local.demo_id), 0, 6))
   resources_prefix = replace("${local.customer_name}-${local.global_id}", "-$", "") # make sure prefixes don't end with a hyphen
   vpc_cidr         = "10.0.0.0/16"
-  database_name    = "demodb"
 }
 
 data "aws_availability_zones" "available" {

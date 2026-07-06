@@ -8,7 +8,7 @@ This document describes the technical architecture, design decisions, and operat
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                         HCP Terraform                           │
 │  (VCS-driven, dynamic AWS + Vault credentials, 3-step apply)   │
@@ -73,7 +73,7 @@ This demo uses a three-step gated deployment pattern. Steps are controlled by bo
 Resources provisioned:
 
 | Resource | Description |
-|---|---|
+| --- | --- |
 | `module.vpc` | AWS VPC, private/public subnets across up to 3 AZs, NAT Gateway |
 | `module.eks` | EKS cluster v1.34, managed node group, core addons |
 | `vault_namespace.namespace` | Isolated Vault namespace scoped to this demo |
@@ -87,7 +87,7 @@ After Step 1, the AWS infrastructure is provisioned and the initial Vault secret
 Resources provisioned:
 
 | Resource | Description |
-|---|---|
+| --- | --- |
 | `kubernetes_namespace_v1.simple_app` | Dedicated namespace `simple-app` |
 | `aws_eip.nginx_ingress` | 3 Elastic IPs for the Network Load Balancer |
 | `helm_release.nginx_ingress` | Nginx ingress controller (internet-facing NLB) |
@@ -107,7 +107,7 @@ After Step 2, the VSO operator is running with the CSI driver sidecar, and Vault
 Resources provisioned:
 
 | Resource | Description |
-|---|---|
+| --- | --- |
 | `kubernetes_manifest.vault_csi_secret` | `CSISecrets` CR referencing `creds/app/config` |
 | `kubernetes_deployment_v1.static_app` | Go web app (`drum0r/demo-go-web:v1.1.0`), 3 replicas |
 | `kubernetes_service_v1.static_app` | ClusterIP service exposing port 8080 |
@@ -123,7 +123,7 @@ After Step 3, the web application is accessible via the Elastic IP and renders V
 
 The VSO CSI integration delivers secrets as ephemeral volume files mounted into the pod filesystem. The flow is:
 
-```
+```text
 Vault KV Secret
       │
       ▼
@@ -140,6 +140,7 @@ Application reads secret as a file (e.g., /var/run/secrets/vault/message)
 ```
 
 Key properties:
+
 - **No Kubernetes Secret object is created.** The secret data never enters the Kubernetes API server as a persistent object.
 - **Secret data is ephemeral.** The CSI volume exists only for the lifetime of the pod. When the pod terminates, the mounted secret data is removed.
 - **Vault is the single source of truth.** The application always reads from a Vault-backed volume, not a cached copy.
@@ -202,7 +203,8 @@ This behavior makes the rotation process deliberate and controlled: secrets upda
 The nginx ingress controller is deployed with an internet-facing AWS Network Load Balancer (NLB). Three Elastic IPs are pre-allocated and associated with the NLB via `service.beta.kubernetes.io/aws-load-balancer-eip-allocations`. This ensures a stable, predictable public IP for the demo application.
 
 Traffic flow:
-```
+
+```text
 Internet → Elastic IP (NLB) → nginx ingress controller → simple-app service → pod (port 8080)
 ```
 
@@ -231,7 +233,7 @@ configured Vault run role (`TFC_VAULT_RUN_ROLE`), avoiding long-lived static Vau
 ## Design Decisions
 
 | Decision | Rationale |
-|---|---|
+| --- | --- |
 | Numbered file naming (`1_`, `2_`, `3_`) | Makes the deployment order explicit and self-documenting |
 | `time_sleep` gates between steps | Ensures cluster readiness before Helm charts and Kubernetes resources are applied |
 | CSI driver over VaultStaticSecret CRD | Demonstrates direct pod-level secret injection without creating Kubernetes Secret objects |
@@ -246,7 +248,7 @@ configured Vault run role (`TFC_VAULT_RUN_ROLE`), avoiding long-lived static Vau
 ## Provider Versions
 
 | Provider | Version |
-|---|---|
+| --- | --- |
 | `hashicorp/aws` | `6.37.0` |
 | `hashicorp/vault` | `5.8.0` |
 | `hashicorp/helm` | `3.1.1` |
@@ -263,7 +265,7 @@ Terraform required version: `>= 1.5.0`
 ## CI/CD
 
 | Workflow | Trigger | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `terraform.yml` | Pull request | Runs `terraform fmt` and pushes formatting fixes back to the PR branch |
 | `documentation.yml` | Pull request | Runs `terraform-docs` to regenerate `README.md` from header/footer templates |
 | `linter.yml` | Pull request | Runs Super Linter (GitHub Actions, JSON, Markdown, TFLint, YAML) |

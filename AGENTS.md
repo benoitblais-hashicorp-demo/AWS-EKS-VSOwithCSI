@@ -7,6 +7,7 @@ This file provides instructions for AI coding agents working on this Terraform P
 This project provisions an AWS Elastic Kubernetes Service (EKS) cluster integrated with Vault Secrets Operator (VSO) and the Secrets Store CSI driver using Terraform. It demonstrates how Vault secrets can be securely delivered directly into Kubernetes pods via CSI volume mounts without ever being stored as Kubernetes Secrets.
 
 The configuration is deployed in three sequential steps controlled by boolean variables (`step_2`, `step_3`):
+
 - **Step 1 (default):** AWS VPC, EKS cluster, Vault namespace, and static KV secrets.
 - **Step 2:** Kubernetes tooling — nginx ingress, VSO Helm chart, Vault Kubernetes auth backend, and RBAC bindings.
 - **Step 3:** Application deployment — CSISecrets custom resource and Go web application with Vault-mounted secrets.
@@ -70,6 +71,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 ## README_header.md
 
 When editing or creating `docs/README_header.md`, ensure it contains:
+
 - A description of the general purpose of the code.
 - A `Permissions` section containing the permissions required to provision resources for each provider.
 - An `Authentications` section containing the authentication details required for each provider.
@@ -78,6 +80,7 @@ When editing or creating `docs/README_header.md`, ensure it contains:
 ## README_footer.md
 
 When editing or creating `docs/README_footer.md`, ensure it contains:
+
 - An `External Documentation` section providing links to relevant external documentation used to develop the code (e.g., AWS, Kubernetes, Helm, and Vault Provider docs, HashiCorp learn guides for VSO and CSI).
 
 ## Code Guidelines

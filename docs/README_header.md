@@ -136,22 +136,22 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 
 ### Observe the behavior
 
-6. Reload the demo web application — the **original message is still displayed**. This is expected:
+1. Reload the demo web application — the **original message is still displayed**. This is expected:
    the CSI volume is bound to the pod at startup and is not live-reloaded while the pod is running.
    Vault still holds the updated secret, but the running pod retains the prior version in its
    ephemeral volume.
 
 ### Apply the rotation to running pods
 
-7. Trigger a rolling restart of the deployment:
+1. Trigger a rolling restart of the deployment:
 
    ```bash
    kubectl rollout restart deployment/static-secrets -n simple-app
    ```
 
-8. As each pod is replaced, the VSO CSI driver re-authenticates to Vault, reads the current
+2. As each pod is replaced, the VSO CSI driver re-authenticates to Vault, reads the current
    secret version, and injects the new data into the replacement pod's ephemeral volume.
-9. Reload the demo web application — the **new message from Vault is now displayed**.
+3. Reload the demo web application — the **new message from Vault is now displayed**.
 
 ### What this demonstrates
 
