@@ -14,7 +14,10 @@ metadata:
   name: csi-secret
   namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
 spec:
-  vaultAuthRef: default
+  vaultAuthRef:
+    name: default
+    namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
+    trustNamespace: false
   secrets:
     vaultStaticSecrets:
       - mount: ${vault_mount.credentials.path}
