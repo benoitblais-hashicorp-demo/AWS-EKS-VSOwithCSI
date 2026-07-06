@@ -7,7 +7,7 @@ data "aws_iam_session_context" "current" {
 }
 
 locals {
-  extra_doormat_role = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws_${var.doormat_username}-developer"
+  extra_doormat_role = var.doormat_username != "" ? "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws_${var.doormat_username}-developer" : null
   partition          = data.aws_partition.current.partition
 }
 
@@ -20,7 +20,7 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
   vpc_id                                   = module.vpc.vpc_id
   subnet_ids                               = module.vpc.private_subnets
-  access_entries = {
+  access_entries = local.extra_doormat_role != null ? {
     example = {
       kubernetes_groups = []
       principal_arn     = local.extra_doormat_role
@@ -34,11 +34,11 @@ module "eks" {
         }
       }
     }
-  }
-  kms_key_administrators = [
+  } : {}
+  kms_key_administrators = compact([
     local.extra_doormat_role,
     data.aws_iam_session_context.current.issuer_arn,
-  ]
+  ])
   addons = {
     coredns = {
       before_compute = true

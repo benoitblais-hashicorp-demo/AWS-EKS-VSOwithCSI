@@ -5,11 +5,12 @@
 #------------------------------------------------------------------------------
 
 variable "doormat_username" {
-  description = "(Required) Doormat username used to construct the IAM developer role ARN for EKS cluster access and KMS key administration (e.g. firstname.lastname_company)."
+  description = "(Optional) Doormat username used to construct the IAM developer role ARN for EKS cluster access and KMS key administration (e.g. firstname.lastname_company). Leave empty to skip adding the doormat role as a KMS key administrator and EKS access entry."
   type        = string
+  default     = ""
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9._-]+$", var.doormat_username))
+    condition     = var.doormat_username == "" || can(regex("^[a-zA-Z0-9._-]+$", var.doormat_username))
     error_message = "doormat_username must contain only letters, numbers, dots, underscores, or hyphens."
   }
 }
