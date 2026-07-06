@@ -88,22 +88,33 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 
 1. Set `step_2 = false` and `step_3 = false` (default values).
 2. Trigger Run #1.
-3. Confirm the EKS cluster is healthy and the Vault secret exists at `creds/app/config`.
-4. Confirm the Vault namespace output is available from the workspace outputs.
+3. Confirm the EKS cluster is healthy:
+   - Open the **AWS Console → EKS → Clusters** and verify `hashicat-inc-ynfyas-eks` shows **Active** status.
+4. Confirm the Vault secret was created:
+   - Open the **Vault UI** using the `vault_address` output.
+   - Switch to the namespace shown in the `vault_namespace` output.
+   - Navigate to **Secrets → creds → app/config** and verify the secret exists.
 
 ### Step 2 — Deploy Kubernetes tooling
 
 1. Set `step_2 = true` in the workspace variables.
 2. Trigger Run #2.
-3. Confirm the VSO pod is running: `kubectl get pods -n simple-app`.
-4. Verify the `csi.vso.hashicorp.com` driver is registered on the node:
-   `kubectl get csidrivers`.
+3. Confirm the VSO pod is running:
+   - Open the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**.
+   - Click the **Resources** tab → **Workloads → Pods**.
+   - Filter by namespace `simple-app` and verify a `vault-secrets-operator-*` pod shows **Running** status.
+4. Confirm the VSO CSI driver is registered:
+   - In the same **Resources** tab, navigate to **Storage → CSI Drivers**.
+   - Verify `csi.vso.hashicorp.com` appears in the list.
 
 ### Step 3 — Deploy the application
 
 1. Set `step_3 = true` in the workspace variables.
 2. Trigger Run #3.
-3. Wait for the deployment to become healthy: `kubectl rollout status deployment/static-secrets -n simple-app`.
+3. Confirm all 3 replicas are ready:
+   - Open the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**.
+   - Click the **Resources** tab → **Workloads → Deployments**.
+   - Filter by namespace `simple-app` and verify `static-secrets` shows **3/3** pods ready.
 4. Open the demo website using the `website` Terraform output (`http://<elastic-ip>`).
 5. The page displays the `message` value stored in Vault (`creds/app/config`).
 
@@ -112,14 +123,6 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 - The step variables are not auto-updated by Terraform.
 - You must change `step_2` and `step_3` manually at the workspace level.
 - The full demo requires three separate runs in sequence.
-
-### Validate kubectl access
-
-Use the `kubernetes_info` output to configure local `kubectl` access:
-
-```bash
-aws eks update-kubeconfig --name <cluster-name> --region <region>
-```
 
 ## Secret Rotation Demo
 
@@ -143,15 +146,13 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 
 ### Apply the rotation to running pods
 
-1. Trigger a rolling restart of the deployment:
-
-   ```bash
-   kubectl rollout restart deployment/static-secrets -n simple-app
-   ```
-
-2. As each pod is replaced, the VSO CSI driver re-authenticates to Vault, reads the current
-   secret version, and injects the new data into the replacement pod's ephemeral volume.
-3. Reload the demo web application — the **new message from Vault is now displayed**.
+1. In the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**, go to the
+   **Resources** tab → **Workloads → Pods**, filter by namespace `simple-app`.
+2. Select all `static-secrets-*` pods and delete them (one at a time or all at once).
+   The deployment controller will immediately schedule replacement pods.
+3. As each replacement pod starts, the VSO CSI driver re-authenticates to Vault, reads
+   the current secret version, and injects the new data into the pod's ephemeral volume.
+4. Reload the demo web application — the **new message from Vault is now displayed**.
 
 ### What this demonstrates
 
