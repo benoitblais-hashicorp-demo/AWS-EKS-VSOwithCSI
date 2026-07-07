@@ -9,8 +9,8 @@ This project provisions an AWS Elastic Kubernetes Service (EKS) cluster integrat
 The configuration is deployed in three sequential steps controlled by boolean variables (`step_2`, `step_3`):
 
 - **Step 1 (default):** AWS VPC, EKS cluster, Vault namespace, and static KV secrets.
-- **Step 2:** Kubernetes tooling — nginx ingress, Uptycs EDR, VSO Helm chart, Vault Kubernetes auth backend, and RBAC bindings.
-- **Step 3:** Application deployment — CSISecrets custom resource and Go web application with Vault-mounted secrets.
+- **Step 2:** Kubernetes tooling — nginx ingress, Route53 DNS and ACM Certificates, Uptycs EDR, VSO Helm chart, Vault Kubernetes auth backend, and RBAC bindings.
+- **Step 3:** Application deployment — CSISecrets CRD, Go web application with Vault-mounted secrets, and automated pod restarter CronJob.
 
 ## Module and Repository Structure
 
@@ -31,6 +31,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 ├── 1_vault_ns.tf         # Vault namespace creation (Step 1)
 ├── 1_vault_static_secrets.tf # KV v2 mount and static secrets (Step 1)
 ├── 2_starting.tf         # Step 2 gate (time_sleep dependency guard)
+├── 2_aws_dns.tf          # ACM certificates and Route53 DNS for Ingress (Step 2)
 ├── 2_kube_tools.tf       # nginx ingress, service account, RBAC (Step 2)
 ├── 2_kube_edr.tf         # Uptycs EDR natively via k8sosquery Helm chart (Step 2)
 ├── 2_kube_vso.tf         # Vault Secrets Operator Helm release (Step 2)
@@ -38,7 +39,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 ├── 2_vault_policy.tf     # Vault policy for app access (Step 2)
 ├── 3_starting.tf         # Step 3 gate (time_sleep dependency guard)
 ├── 3_kube_ingress.tf     # Kubernetes ingress rule (Step 3)
-├── 3_kube_static_app.tf  # CSISecrets CRD, deployment, service (Step 3)
+├── 3_kube_static_app.tf  # CSISecrets CRD, deployment, service, automation (Step 3)
 ├── docs/
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
@@ -107,6 +108,7 @@ Refer to CONTRIBUTING.md for general coding guidelines. HashiCorp's Terraform st
 - Define all providers in the same file (`providers.tf`).
 - Define the default provider first, then aliased providers.
 - Use `alias` as the first parameter in non-default provider blocks.
+- Do not explicitly declare the `address` field inside the `vault` provider configuration - rely on the `TFC_VAULT_ADDR` environment variable injected by HCP Terraform.
 
 ## Security and Secrets
 
