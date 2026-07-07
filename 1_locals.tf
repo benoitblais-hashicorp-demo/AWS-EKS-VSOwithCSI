@@ -1,12 +1,11 @@
 # Copyright IBM Corp. 2024, 2026
 
 locals {
-  customer_name    = var.customer_name != "" ? substr(var.customer_name, 0, 4) : "hashicat-inc"
-  customer_id      = "${random_string.identifier.result}-${local.customer_name}"
+  customer_id      = "${random_string.identifier.result}-hashicat-inc"
   demo_name        = "secrets-operator"
   demo_id          = "${local.customer_id}-${local.demo_name}"
   global_id        = lower(substr(base64encode(local.demo_id), 0, 6))
-  resources_prefix = replace("${local.customer_name}-${local.global_id}", "-$", "") # make sure prefixes don't end with a hyphen
+  resources_prefix = replace("hashicat-inc-${local.global_id}", "-$", "") # make sure prefixes don't end with a hyphen
   vpc_cidr         = "10.0.0.0/16"
 }
 
