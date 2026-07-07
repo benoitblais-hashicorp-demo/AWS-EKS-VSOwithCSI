@@ -8,16 +8,16 @@ import (
 )
 
 func GetStaticPage(c *gin.Context) {
-	// Attempt to read the CSI mounted secret from the expected path
-	cfg := tools.GetConfigFromFile("/var/run/secrets/vault/app/config")
-
-	// Fallback to environment variables if the file/keys are missing
-	firstMessage := cfg.Message
+	// 1. Attempt to read the CSI mounted secrets directly from the raw VSO file outputs
+	// VSO creates files named: static_secret_<index>_<key>
+	firstMessage := tools.ReadCSISecretFile("/var/run/secrets/vault/static_secret_0_message")
+	
+	// Fallback to environment variables if the file is missing
 	if firstMessage == "" {
 		firstMessage = tools.GetEnvVariable("FIRST_MESSAGE", "")
 	}
 
-	centralImage := cfg.ImageURL
+	centralImage := tools.ReadCSISecretFile("/var/run/secrets/vault/static_secret_0_image_url")
 	if centralImage == "" {
 		centralImage = tools.GetEnvVariable("IMAGE_URL", "https://avatars.githubusercontent.com/u/320148?v=4")
 	}
