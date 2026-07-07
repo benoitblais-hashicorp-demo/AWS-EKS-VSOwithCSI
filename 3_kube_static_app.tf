@@ -73,8 +73,8 @@ resource "kubernetes_deployment_v1" "static_app" {
       spec {
         service_account_name = kubernetes_service_account_v1.vault[0].metadata.0.name
         container {
-          name  = "static-secrets"
-          image = var.demo_webapp_image
+          name              = "static-secrets"
+          image             = var.demo_webapp_image
           image_pull_policy = "Always"
           port {
             container_port = 8080
@@ -156,6 +156,77 @@ resource "kubernetes_service_v1" "static_app" {
 
     selector = {
       app = "static-secrets"
+    }
+  }
+}
+
+resource "kubernetes_service_account_v1" "restarter" {
+  count      = var.step_3 ? 1 : 0
+  depends_on = [time_sleep.step_3]
+  metadata {
+    name      = "pod-restarter"
+    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+  }
+}
+
+resource "kubernetes_role_v1" "restarter" {
+  count      = var.step_3 ? 1 : 0
+  depends_on = [time_sleep.step_3]
+  metadata {
+    name      = "pod-restarter"
+    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+  }
+  rule {
+    api_groups = ["apps"]
+    resources  = ["deployments"]
+    verbs      = ["get", "patch", "list"]
+  }
+}
+
+resource "kubernetes_role_binding_v1" "restarter" {
+  count      = var.step_3 ? 1 : 0
+  depends_on = [time_sleep.step_3]
+  metadata {
+    name      = "pod-restarter"
+    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role_v1.restarter[0].metadata.0.name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.restarter[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+  }
+}
+
+resource "kubernetes_cron_job_v1" "restarter" {
+  count      = var.step_3 ? 1 : 0
+  depends_on = [time_sleep.step_3]
+  metadata {
+    name      = "static-secrets-restarter"
+    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+  }
+  spec {
+    schedule = "* * * * *"
+    job_template {
+      metadata {}
+      spec {
+        template {
+          metadata {}
+          spec {
+            service_account_name = kubernetes_service_account_v1.restarter[0].metadata.0.name
+            container {
+              name    = "kubectl"
+              image   = "bitnami/kubectl:latest"
+              command = ["kubectl", "rollout", "restart", "deployment/static-secrets"]
+            }
+            restart_policy = "OnFailure"
+          }
+        }
+      }
     }
   }
 }
