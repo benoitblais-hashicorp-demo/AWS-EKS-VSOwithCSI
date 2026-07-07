@@ -337,7 +337,7 @@ The following input variables are required:
 
 ### <a name="input_vault_address"></a> [vault\_address](#input\_vault\_address)
 
-Description: (Required) Full URL of the HashiCorp Vault cluster (for example `https://vault.example.com:8200`). Used by the Vault provider and the Vault Secrets Operator Helm chart.
+Description: (Required) Full URL of the HashiCorp Vault cluster (for example `https://vault.example.com:8200`). Used by the Vault Secrets Operator VaultConnection custom resource.
 
 Type: `string`
 
@@ -345,17 +345,9 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
-### <a name="input_customer_name"></a> [customer\_name](#input\_customer\_name)
-
-Description: (Optional) Short name for the customer. Used to prefix and uniquely identify all provisioned resources. Must be lowercase letters, numbers, and hyphens only, 50 characters maximum.
-
-Type: `string`
-
-Default: `""`
-
 ### <a name="input_demo_subdomain"></a> [demo\_subdomain](#input\_demo\_subdomain)
 
-Description: (Optional) The subdomain to prepend to the public\_hosted\_zone for the application (e.g., 'vso-demo').
+Description: (Optional) The subdomain to prepend to the public\_hosted\_zone for the application (e.g., 'vsocsi-demo').
 
 Type: `string`
 
@@ -482,10 +474,6 @@ The following resources are used by this module:
 ## Outputs
 
 The following outputs are exported:
-
-### <a name="output_kubernetes_info"></a> [kubernetes\_info](#output\_kubernetes\_info)
-
-Description: AWS CLI command to configure kubectl access to the EKS cluster
 
 ### <a name="output_vault_address"></a> [vault\_address](#output\_vault\_address)
 
