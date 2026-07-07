@@ -57,6 +57,8 @@ resource "helm_release" "nginx_ingress" {
   upgrade_install = true
   values = [<<-EOT
 controller:
+  config:
+    use-forwarded-headers: "false"
   service:
     ${var.public_hosted_zone != "" ? "targetPorts:\n      https: http" : ""}
     annotations:

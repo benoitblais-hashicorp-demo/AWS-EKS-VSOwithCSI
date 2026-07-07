@@ -3,20 +3,15 @@
 package tools
 
 import (
-	"encoding/json"
 	"os"
+	"strings"
 )
 
-type ConfigFile struct {
-	Message  string `json:"message"`
-	ImageURL string `json:"image_url"`
-}
-
-func GetConfigFromFile(path string) ConfigFile {
-	var cfg ConfigFile
+// ReadCSISecretFile reads a simple text file mounted via CSI Secrets and trims whitespace
+func ReadCSISecretFile(path string) string {
 	data, err := os.ReadFile(path)
 	if err == nil {
-		_ = json.Unmarshal(data, &cfg)
+		return strings.TrimSpace(string(data))
 	}
-	return cfg
+	return ""
 }
