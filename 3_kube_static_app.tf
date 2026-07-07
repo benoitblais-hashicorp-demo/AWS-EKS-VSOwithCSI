@@ -8,6 +8,11 @@ resource "kubernetes_manifest" "vault_csi_secret" {
     kubernetes_manifest.vault_auth,
     vault_generic_secret.credentials,
   ]
+
+  field_manager {
+    force_conflicts = true
+  }
+
   manifest = yamldecode(<<-EOF
 apiVersion: secrets.hashicorp.com/v1beta1
 kind: CSISecrets
