@@ -28,6 +28,7 @@ spec:
       - mount: ${vault_mount.credentials.path}
         type: kv-v2
         path: app/config
+        refreshAfter: 5s
 EOF
   )
 }
@@ -74,6 +75,7 @@ resource "kubernetes_deployment_v1" "static_app" {
         container {
           name  = "static-secrets"
           image = var.demo_webapp_image
+          image_pull_policy = "Always"
           port {
             container_port = 8080
           }
