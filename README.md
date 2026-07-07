@@ -282,6 +282,19 @@ Do not set `VAULT_TOKEN` when using this model.
 The workspace is driven by a VCS connection. No manual `terraform init` or `terraform apply`
 is required. Workspace variables are used for all provider credentials.
 
+## Setup & Deployment
+
+1. Set up an HCP Terraform Workspace connected to your VCS repository.
+2. Configure the required workspace variables and HCP Terraform dynamic credentials (for AWS and Vault) as described in `docs/WORKSPACE.md`.
+3. **Step 1:** Queue a run with `step_2 = false` and `step_3 = false`. This provisions the foundational AWS infrastructure and the Vault namespace.
+4. **Step 2:** Update your workspace variables to set `step_2 = true`. To prevent parallel dependency failures, apply this step on its own to deploy the Kubernetes tooling (Nginx ingress, Uptycs EDR, VSO Helm Chart, Vault Auth).
+5. **Step 3:** Finally, set `step_3 = true` and queue the final run. This deploys the CSISecrets resource and the target application pods.
+
+## Troubleshooting & Known Issues
+
+- **Vault Enterprise Validation Errors:** The VSO CSI driver requires Vault Enterprise to function and hard-validates this requirement by querying the `/sys/license/status` endpoint. If your pod's Vault policy does not grant `read` capability to this endpoint, the volume mount will throw a `vault enterprise client validation failed` error, completely blocking Pod scheduling.
+- **Vault 403 Permission Denied during Token Review:** When mapping the Vault Kubernetes Auth backend inside an HCP Vault dedicated namespace, ensure that the `VaultAuth` custom resource refers to the Vault namespace using the **Namespace ID** instead of the FQDN path. Using the full namespace path generates a 403 error due to token evaluation logic.
+
 ## Documentation
 
 ## Requirements
@@ -340,6 +353,22 @@ Type: `string`
 
 Default: `""`
 
+### <a name="input_demo_subdomain"></a> [demo\_subdomain](#input\_demo\_subdomain)
+
+Description: (Optional) The subdomain to prepend to the public\_hosted\_zone for the application (e.g., 'vso-demo').
+
+Type: `string`
+
+Default: `"vsocsi-demo"`
+
+### <a name="input_demo_webapp_image"></a> [demo\_webapp\_image](#input\_demo\_webapp\_image)
+
+Description: (Optional) The container image reference for the demo web application.
+
+Type: `string`
+
+Default: `"ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0"`
+
 ### <a name="input_doormat_username"></a> [doormat\_username](#input\_doormat\_username)
 
 Description: (Optional) Doormat username used to construct the IAM developer role ARN for EKS cluster access and KMS key administration (e.g. firstname.lastname\_company). Leave empty to skip adding the doormat role as a KMS key administrator and EKS access entry.
@@ -355,6 +384,14 @@ Description: (Optional) EC2 instance type for the EKS managed node group.
 Type: `string`
 
 Default: `"t3.medium"`
+
+### <a name="input_public_hosted_zone"></a> [public\_hosted\_zone](#input\_public\_hosted\_zone)
+
+Description: (Optional) The Route 53 public hosted zone name (e.g., 'example.com') where DNS validation and A records will be published. If set, an ACM certificate will be provisioned directly on the NGINX Network Load Balancer.
+
+Type: `string`
+
+Default: `"benoit-blais.sbx.hashidemos.io"`
 
 ### <a name="input_region"></a> [region](#input\_region)
 
@@ -400,7 +437,11 @@ Default: `"UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
 
 The following resources are used by this module:
 
+- [aws_acm_certificate.public](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/acm_certificate) (resource)
+- [aws_acm_certificate_validation.public](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/acm_certificate_validation) (resource)
 - [aws_eip.nginx_ingress](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/eip) (resource)
+- [aws_route53_record.public_validation](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/route53_record) (resource)
+- [aws_route53_record.web_dns_record](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/route53_record) (resource)
 - [helm_release.nginx_ingress](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.uptycs_edr](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.vault_secrets_operator](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
@@ -432,6 +473,7 @@ The following resources are used by this module:
 - [aws_ec2_instance_type_offerings.supported](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/ec2_instance_type_offerings) (data source)
 - [aws_iam_session_context.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/iam_session_context) (data source)
 - [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/partition) (data source)
+- [aws_route53_zone.demo](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/route53_zone) (data source)
 
 ## Outputs
 

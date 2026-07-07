@@ -73,7 +73,7 @@ resource "kubernetes_deployment_v1" "static_app" {
         service_account_name = kubernetes_service_account_v1.vault[0].metadata.0.name
         container {
           name  = "static-secrets"
-          image = "drum0r/demo-go-web:v1.1.0"
+          image = var.demo_webapp_image
           port {
             container_port = 8080
           }

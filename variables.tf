@@ -40,6 +40,18 @@ variable "customer_name" {
   }
 }
 
+variable "demo_subdomain" {
+  description = "(Optional) The subdomain to prepend to the public_hosted_zone for the application (e.g., 'vso-demo')."
+  type        = string
+  default     = "vsocsi-demo"
+}
+
+variable "demo_webapp_image" {
+  description = "(Optional) The container image reference for the demo web application."
+  type        = string
+  default     = "ghcr.io/benoitblais-hashicorp-demo/demo-go-web-vso-csi:v1.2.0"
+}
+
 variable "instance_type" {
   description = "(Optional) EC2 instance type for the EKS managed node group."
   type        = string
@@ -57,6 +69,12 @@ variable "instance_type" {
     ], var.instance_type)
     error_message = "instance_type must be one of: t3.medium, t3.large, t3.xlarge, m6i.large, m6i.xlarge, m6a.large, or m6a.xlarge."
   }
+}
+
+variable "public_hosted_zone" {
+  description = "(Optional) The Route 53 public hosted zone name (e.g., 'example.com') where DNS validation and A records will be published. If set, an ACM certificate will be provisioned directly on the NGINX Network Load Balancer."
+  type        = string
+  default     = "benoit-blais.sbx.hashidemos.io"
 }
 
 variable "region" {

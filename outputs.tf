@@ -18,5 +18,5 @@ output "vault_namespace" {
 
 output "website" {
   description = "Public URL of the VSO + CSI demo web application (available after step_3 = true)"
-  value       = var.step_2 && var.step_3 ? try("http://${aws_eip.nginx_ingress[0].public_ip}", "") : ""
+  value       = var.step_2 && var.step_3 ? (var.public_hosted_zone != "" ? "https://${var.demo_subdomain}.${var.public_hosted_zone}" : "http://${try(aws_eip.nginx_ingress[0].public_ip, "")}") : ""
 }
