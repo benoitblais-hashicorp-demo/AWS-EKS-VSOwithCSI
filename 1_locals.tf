@@ -1,65 +1,19 @@
 # Copyright IBM Corp. 2024, 2026
 
-locals {
-  customer_id      = "${random_string.identifier.result}-hashicat-inc"
-  demo_name        = "secrets-operator"
-  demo_id          = "${local.customer_id}-${local.demo_name}"
-  global_id        = lower(substr(base64encode(local.demo_id), 0, 6))
-  resources_prefix = replace("hashicat-inc-${local.global_id}", "-$", "") # make sure prefixes don't end with a hyphen
-  vpc_cidr         = "10.0.0.0/16"
-}
-
-data "aws_availability_zones" "available" {
-  filter {
-    name   = "zone-type"
-    values = ["availability-zone"]
-  }
-
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-}
-
-data "aws_ec2_instance_type_offerings" "supported" {
-  location_type = "availability-zone"
-
-  filter {
-    name   = "instance-type"
-    values = [var.instance_type]
-  }
-}
+# ==============================================================================
+# LOCAL IDENTIFIERS
+# ==============================================================================
+# This file generates a randomized suffix to attach to the demo's global prefix.
+# This ensures that multiple instances of this demo can securely run in the 
+# same AWS account without causing naming collisions (e.g., Load Balancers, VPCs).
+# ==============================================================================
 
 locals {
-  candidate_azs = [
-    for az in data.aws_availability_zones.available.names : az
-    if contains(data.aws_ec2_instance_type_offerings.supported.locations, az)
-  ]
-
-  sorted_candidate_azs = sort(local.candidate_azs)
-
-  azs = slice(
-    local.sorted_candidate_azs,
-    0,
-    min(length(local.sorted_candidate_azs), 3)
-  )
+  global_id        = random_string.identifier.result
+  resources_prefix = "${var.resources_prefix}-${local.global_id}"
 }
 
-#------------------------------------------------------------------------------------
-# Enable for debugging purposes
-#------------------------------------------------------------------------------------
-
-# resource "terraform_data" "availability_zones" {
-#   input = {
-#     availability_zones   = data.aws_availability_zones.available.names
-#     offerings            = data.aws_ec2_instance_type_offerings.supported.locations
-#     candidate_azs        = local.candidate_azs
-#     sorted_candidate_azs = local.sorted_candidate_azs
-#     azs                  = local.azs
-#     timestamp            = timestamp()
-#   }
-# }
-
+# Generate a 4-character random lowercase string (e.g., 'a1b2')
 resource "random_string" "identifier" {
   length  = 4
   special = false

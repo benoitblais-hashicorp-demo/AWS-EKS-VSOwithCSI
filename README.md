@@ -36,7 +36,7 @@ making it easy to walk through the architecture live or use it as a training env
 - **AWS networking:** VPC, private and public subnets, Internet Gateway, NAT Gateway.
 - **Compute:** EKS cluster with a managed node group (t3.medium, 1–3 nodes).
 - **Ingress:** nginx ingress controller, AWS NLB, 3 pre-allocated Elastic IPs.
-- **Vault:** Namespace, KV v2 mount (`creds`), static secret (`creds/app/config`), Kubernetes
+- **Vault:** Namespace, KV v2 mount (`webapp`), static secret (`webapp/app/config`), Kubernetes
   auth backend, role, and policy.
 - **VSO:** Helm release v1.3.0 with the CSI driver side-car enabled (`csi.enabled: true`).
 - **Kubernetes workload:** `CSISecrets` CR, deployment (3 replicas), ClusterIP service, ingress rule.
@@ -46,7 +46,7 @@ making it easy to walk through the architecture live or use it as a training env
 ## How this demo works
 
 1. Terraform provisions the AWS VPC and the EKS cluster (Step 1).
-2. Terraform creates a Vault namespace and a static KV v2 secret (`creds/app/config`) with a
+2. Terraform creates a Vault namespace and a static KV v2 secret (`webapp/app/config`) with a
    `message` and `image_url` field (Step 1).
 3. Terraform deploys the VSO Helm chart with the CSI driver enabled. The CSI driver registers
    the `csi.vso.hashicorp.com` storage driver on each node (Step 2).
@@ -94,7 +94,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 4. Confirm the Vault secret was created:
    - Open the **Vault UI** using the `vault_address` output.
    - Switch to the namespace shown in the `vault_namespace` output.
-   - Navigate to **Secrets → creds → app/config** and verify the secret exists.
+   - Navigate to **Secrets → webapp → app/config** and verify the secret exists.
 
 ### Step 2 — Deploy Kubernetes tooling
 
@@ -117,7 +117,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
    - Click the **Resources** tab → **Workloads → Deployments**.
    - Filter by namespace `simple-app` and verify `static-secrets` shows **3/3** pods ready.
 4. Open the demo website using the `website` Terraform output (`http://<elastic-ip>`).
-5. The page displays the `message` value stored in Vault (`creds/app/config`).
+5. The page displays the `message` value stored in Vault (`webapp/app/config`).
 
 ### Important behavior
 
@@ -130,7 +130,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 Once the application is running, it is helpful to explain how the configuration pieces fit together to enable the CSI integration:
 
 1. **Vault Policy (`2_vault_policy.tf`)**:
-   Show the `apps-policy` in Vault. Explain that this policy grants read-only access strictly to the `creds/*` path where the application's secret resides.
+   Show the `apps-policy` in Vault. Explain that this policy grants read-only access strictly to the `webapp/*` path where the application's secret resides.
 2. **Kubernetes Auth Method (`2_vault_kube.tf`)**:
    Explain how Vault is configured to trust the EKS cluster. Show the `simple-app` role in Vault, which ties the `apps-policy` to the specific Kubernetes service account (`vault-auth`) and namespace (`simple-app`), enforcing strict identity mapping.
 3. **Vault Secrets Operator Helm Chart (`2_kube_vso.tf`)**:
@@ -151,7 +151,7 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 
 1. Open the Vault UI using the `vault_address` output.
 2. Switch to the namespace shown in the `vault_namespace` output.
-3. Navigate to **Secrets > creds > app/config** and click **Create new version**.
+3. Navigate to **Secrets > webapp > app/config** and click **Create new version**.
 4. Change the `message` field to a new value (for example:
    `"Secret rotation in action — version 2!"`).
 5. Save the new version.
@@ -234,7 +234,7 @@ The Vault token or dynamic credential used by Terraform must have the following 
 
 - Create and manage namespaces (`sys/namespaces/*`).
 - Enable and configure secret engines (`sys/mounts/*`).
-- Create and update KV v2 secrets (`<namespace>/creds/*`).
+- Create and update KV v2 secrets (`<namespace>/webapp/*`).
 - Enable and configure the Kubernetes auth backend (`sys/auth/*`, `auth/kubernetes/*`).
 - Create and manage Vault policies (`sys/policies/acl/*`).
 
@@ -303,7 +303,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
 
-- <a name="requirement_aws"></a> [aws](#requirement\_aws) (6.37.0)
+- <a name="requirement_aws"></a> [aws](#requirement\_aws) (~> 6.0)
 
 - <a name="requirement_helm"></a> [helm](#requirement\_helm) (3.1.1)
 
@@ -329,7 +329,7 @@ Version: 21.15.1
 
 Source: terraform-aws-modules/vpc/aws
 
-Version: 6.6.0
+Version: ~> 5.16
 
 ## Required Inputs
 
@@ -344,6 +344,30 @@ Type: `string`
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_TFC_PROJECT_NAME"></a> [TFC\_PROJECT\_NAME](#input\_TFC\_PROJECT\_NAME)
+
+Description: (Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-project tag in AWS.
+
+Type: `string`
+
+Default: `"local-project"`
+
+### <a name="input_TFC_WORKSPACE_NAME"></a> [TFC\_WORKSPACE\_NAME](#input\_TFC\_WORKSPACE\_NAME)
+
+Description: (Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-workspace-slug tag in AWS.
+
+Type: `string`
+
+Default: `"local-workspace"`
+
+### <a name="input_customer_name"></a> [customer\_name](#input\_customer\_name)
+
+Description: (Optional) Corresponds to the cdl-customer-name tag in AWS.
+
+Type: `string`
+
+Default: `"hashicat"`
 
 ### <a name="input_demo_subdomain"></a> [demo\_subdomain](#input\_demo\_subdomain)
 
@@ -369,6 +393,14 @@ Type: `string`
 
 Default: `""`
 
+### <a name="input_environment"></a> [environment](#input\_environment)
+
+Description: (Optional) Corresponds to the environment tag in AWS.
+
+Type: `string`
+
+Default: `"dev"`
+
 ### <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type)
 
 Description: (Optional) EC2 instance type for the EKS managed node group.
@@ -392,6 +424,22 @@ Description: (Optional) AWS region where all resources are provisioned.
 Type: `string`
 
 Default: `"ca-central-1"`
+
+### <a name="input_resources_prefix"></a> [resources\_prefix](#input\_resources\_prefix)
+
+Description: (Optional) Prefix applied to all resources.
+
+Type: `string`
+
+Default: `"vso-csi"`
+
+### <a name="input_salesforce_opportunity_id"></a> [salesforce\_opportunity\_id](#input\_salesforce\_opportunity\_id)
+
+Description: (Optional) Corresponds to the salesforce\_id tag in AWS.
+
+Type: `string`
+
+Default: `"N/A"`
 
 ### <a name="input_static_app_rollout_token"></a> [static\_app\_rollout\_token](#input\_static\_app\_rollout\_token)
 
@@ -425,15 +473,23 @@ Type: `string`
 
 Default: `"UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"`
 
+### <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr)
+
+Description: (Optional) IPv4 CIDR block for the AWS VPC.
+
+Type: `string`
+
+Default: `"10.0.0.0/16"`
+
 ## Resources
 
 The following resources are used by this module:
 
-- [aws_acm_certificate.public](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/acm_certificate) (resource)
-- [aws_acm_certificate_validation.public](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/acm_certificate_validation) (resource)
-- [aws_eip.nginx_ingress](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/eip) (resource)
-- [aws_route53_record.public_validation](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/route53_record) (resource)
-- [aws_route53_record.web_dns_record](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/route53_record) (resource)
+- [aws_acm_certificate.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) (resource)
+- [aws_acm_certificate_validation.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) (resource)
+- [aws_eip.nginx_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) (resource)
+- [aws_route53_record.public_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) (resource)
+- [aws_route53_record.web_dns_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) (resource)
 - [helm_release.nginx_ingress](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.uptycs_edr](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.vault_secrets_operator](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
@@ -458,18 +514,18 @@ The following resources are used by this module:
 - [time_sleep.step_2](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
 - [time_sleep.step_3](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
 - [vault_auth_backend.kube_auth](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/auth_backend) (resource)
-- [vault_generic_secret.credentials](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/generic_secret) (resource)
+- [vault_generic_secret.webapp_config](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/generic_secret) (resource)
 - [vault_kubernetes_auth_backend_config.kube_auth_cfg](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/kubernetes_auth_backend_config) (resource)
 - [vault_kubernetes_auth_backend_role.simple_app_role](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/kubernetes_auth_backend_role) (resource)
-- [vault_mount.credentials](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/mount) (resource)
+- [vault_mount.webapp](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/mount) (resource)
 - [vault_namespace.namespace](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/namespace) (resource)
 - [vault_policy.apps_policy](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/policy) (resource)
-- [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/availability_zones) (data source)
-- [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/caller_identity) (data source)
-- [aws_ec2_instance_type_offerings.supported](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/ec2_instance_type_offerings) (data source)
-- [aws_iam_session_context.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/iam_session_context) (data source)
-- [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/partition) (data source)
-- [aws_route53_zone.demo](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/route53_zone) (data source)
+- [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) (data source)
+- [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) (data source)
+- [aws_ec2_instance_type_offerings.supported](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ec2_instance_type_offerings) (data source)
+- [aws_iam_session_context.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_session_context) (data source)
+- [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) (data source)
+- [aws_route53_zone.demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) (data source)
 
 ## Outputs
 

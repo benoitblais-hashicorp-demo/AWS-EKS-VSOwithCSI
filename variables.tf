@@ -18,6 +18,12 @@ variable "vault_address" {
 # Optional variables
 #------------------------------------------------------------------------------
 
+variable "customer_name" {
+  description = "(Optional) Corresponds to the cdl-customer-name tag in AWS."
+  type        = string
+  default     = "hashicat"
+}
+
 variable "demo_subdomain" {
   description = "(Optional) The subdomain to prepend to the public_hosted_zone for the application (e.g., 'vsocsi-demo')."
   type        = string
@@ -99,4 +105,42 @@ variable "uptycs_tags" {
   description = "(Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER format."
   type        = string
   default     = "UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
+}
+
+variable "environment" {
+  description = "(Optional) Corresponds to the environment tag in AWS."
+  type        = string
+  default     = "dev"
+}
+
+variable "resources_prefix" {
+  description = "(Optional) Prefix applied to all resources."
+  type        = string
+  default     = "vso-csi"
+}
+
+variable "salesforce_opportunity_id" {
+  description = "(Optional) Corresponds to the salesforce_id tag in AWS."
+  type        = string
+  default     = "N/A"
+}
+
+# tflint-ignore: terraform_naming_convention
+variable "TFC_WORKSPACE_NAME" {
+  description = "(Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-workspace-slug tag in AWS."
+  type        = string
+  default     = "local-workspace"
+}
+
+# tflint-ignore: terraform_naming_convention
+variable "TFC_PROJECT_NAME" {
+  description = "(Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-project tag in AWS."
+  type        = string
+  default     = "local-project"
+}
+
+variable "vpc_cidr" {
+  description = "(Optional) IPv4 CIDR block for the AWS VPC."
+  type        = string
+  default     = "10.0.0.0/16"
 }

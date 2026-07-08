@@ -5,7 +5,7 @@ resource "time_sleep" "step_2" {
   depends_on = [
     module.eks,
     module.vpc,
-    vault_generic_secret.credentials,
+    vault_generic_secret.webapp_config,
   ]
   create_duration  = "10s"
   destroy_duration = "10s"

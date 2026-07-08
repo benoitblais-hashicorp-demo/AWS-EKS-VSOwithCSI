@@ -6,7 +6,7 @@ resource "kubernetes_manifest" "vault_csi_secret" {
     time_sleep.step_3,
     helm_release.vault_secrets_operator,
     kubernetes_manifest.vault_auth,
-    vault_generic_secret.credentials,
+    vault_generic_secret.webapp_config,
   ]
 
   field_manager {
@@ -31,7 +31,7 @@ spec:
     namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
   secrets:
     vaultStaticSecrets:
-      - mount: ${vault_mount.credentials.path}
+      - mount: ${vault_mount.webapp.path}
         type: kv-v2
         path: app/config
         refreshAfter: 5s

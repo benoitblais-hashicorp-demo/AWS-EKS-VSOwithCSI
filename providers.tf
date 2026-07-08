@@ -9,6 +9,20 @@ provider "vault" {
 provider "aws" {
   # shared_config_files = [var.tfc_aws_dynamic_credentials.default.shared_config_file]
   region = var.region
+
+  default_tags {
+    tags = {
+      hc-repo                = "github.com/benoitblais-hashicorp-demo/AWS-EKS-VSOwithCSI"
+      hc-owner               = "benoit.blais@hashicorp.com"
+      cdl-customer-name      = var.customer_name
+      cdl-name               = "vso-csi"
+      cdl-ddr-workspace-slug = var.TFC_WORKSPACE_NAME
+      cdl-ddr-project        = var.TFC_PROJECT_NAME
+      environment            = var.environment
+      region                 = var.region
+      salesforce_id          = var.salesforce_opportunity_id
+    }
+  }
 }
 
 provider "helm" {
