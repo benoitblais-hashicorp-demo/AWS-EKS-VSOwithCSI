@@ -327,9 +327,9 @@ Version: 21.15.1
 
 ### <a name="module_vpc"></a> [vpc](#module\_vpc)
 
-Source: terraform-aws-modules/vpc/aws
+Source: app.terraform.io/benoitblais-hashicorp/vpc/aws
 
-Version: 6.6.0
+Version: ~> 0.0.1
 
 ## Required Inputs
 
@@ -344,6 +344,30 @@ Type: `string`
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_TFC_PROJECT_NAME"></a> [TFC\_PROJECT\_NAME](#input\_TFC\_PROJECT\_NAME)
+
+Description: (Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-project tag in AWS.
+
+Type: `string`
+
+Default: `"local-project"`
+
+### <a name="input_TFC_WORKSPACE_NAME"></a> [TFC\_WORKSPACE\_NAME](#input\_TFC\_WORKSPACE\_NAME)
+
+Description: (Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-workspace-slug tag in AWS.
+
+Type: `string`
+
+Default: `"local-workspace"`
+
+### <a name="input_customer_name"></a> [customer\_name](#input\_customer\_name)
+
+Description: (Optional) Corresponds to the cdl-customer-name tag in AWS.
+
+Type: `string`
+
+Default: `"hashicat"`
 
 ### <a name="input_demo_subdomain"></a> [demo\_subdomain](#input\_demo\_subdomain)
 
@@ -369,6 +393,14 @@ Type: `string`
 
 Default: `""`
 
+### <a name="input_environment"></a> [environment](#input\_environment)
+
+Description: (Optional) Corresponds to the environment tag in AWS.
+
+Type: `string`
+
+Default: `"dev"`
+
 ### <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type)
 
 Description: (Optional) EC2 instance type for the EKS managed node group.
@@ -392,6 +424,22 @@ Description: (Optional) AWS region where all resources are provisioned.
 Type: `string`
 
 Default: `"ca-central-1"`
+
+### <a name="input_resources_prefix"></a> [resources\_prefix](#input\_resources\_prefix)
+
+Description: (Optional) Prefix applied to all resources.
+
+Type: `string`
+
+Default: `"vso-csi"`
+
+### <a name="input_salesforce_opportunity_id"></a> [salesforce\_opportunity\_id](#input\_salesforce\_opportunity\_id)
+
+Description: (Optional) Corresponds to the salesforce\_id tag in AWS.
+
+Type: `string`
+
+Default: `"N/A"`
 
 ### <a name="input_static_app_rollout_token"></a> [static\_app\_rollout\_token](#input\_static\_app\_rollout\_token)
 
@@ -424,6 +472,14 @@ Description: (Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER for
 Type: `string`
 
 Default: `"UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"`
+
+### <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr)
+
+Description: (Optional) IPv4 CIDR block for the AWS VPC.
+
+Type: `string`
+
+Default: `"10.0.0.0/16"`
 
 ## Resources
 
@@ -458,10 +514,10 @@ The following resources are used by this module:
 - [time_sleep.step_2](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
 - [time_sleep.step_3](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
 - [vault_auth_backend.kube_auth](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/auth_backend) (resource)
-- [vault_generic_secret.credentials](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/generic_secret) (resource)
+- [vault_generic_secret.webapp_config](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/generic_secret) (resource)
 - [vault_kubernetes_auth_backend_config.kube_auth_cfg](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/kubernetes_auth_backend_config) (resource)
 - [vault_kubernetes_auth_backend_role.simple_app_role](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/kubernetes_auth_backend_role) (resource)
-- [vault_mount.credentials](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/mount) (resource)
+- [vault_mount.webapp](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/mount) (resource)
 - [vault_namespace.namespace](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/namespace) (resource)
 - [vault_policy.apps_policy](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/policy) (resource)
 - [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/availability_zones) (data source)
