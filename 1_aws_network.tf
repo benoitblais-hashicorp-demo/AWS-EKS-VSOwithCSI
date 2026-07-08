@@ -57,10 +57,10 @@ locals {
 # VPC CONFIGURATION
 # ------------------------------------------------------------------------------
 
-# Provision the VPC utilizing the private HashiCorp Terraform module registry
+# Provision the VPC utilizing the public Terraform AWS module
 module "vpc" {
-  source             = "app.terraform.io/benoitblais-hashicorp/vpc/aws"
-  version            = "~> 0.0.1"
+  source             = "terraform-aws-modules/vpc/aws"
+  version            = "~> 5.16"
   name               = "${local.resources_prefix}-vpc"
   cidr               = var.vpc_cidr
   azs                = local.azs
