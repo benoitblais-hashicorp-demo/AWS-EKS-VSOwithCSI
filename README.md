@@ -327,9 +327,9 @@ Version: 21.15.1
 
 ### <a name="module_vpc"></a> [vpc](#module\_vpc)
 
-Source: app.terraform.io/benoitblais-hashicorp/vpc/aws
+Source: terraform-aws-modules/vpc/aws
 
-Version: ~> 0.0.1
+Version: ~> 5.16
 
 ## Required Inputs
 
