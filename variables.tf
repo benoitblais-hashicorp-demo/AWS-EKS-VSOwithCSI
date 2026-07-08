@@ -125,12 +125,14 @@ variable "salesforce_opportunity_id" {
   default     = "N/A"
 }
 
+# tflint-ignore: terraform_naming_convention
 variable "TFC_WORKSPACE_NAME" {
   description = "(Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-workspace-slug tag in AWS."
   type        = string
   default     = "local-workspace"
 }
 
+# tflint-ignore: terraform_naming_convention
 variable "TFC_PROJECT_NAME" {
   description = "(Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-project tag in AWS."
   type        = string
