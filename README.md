@@ -303,7 +303,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
 
-- <a name="requirement_aws"></a> [aws](#requirement\_aws) (6.37.0)
+- <a name="requirement_aws"></a> [aws](#requirement\_aws) (~> 6.0)
 
 - <a name="requirement_helm"></a> [helm](#requirement\_helm) (3.1.1)
 
@@ -485,11 +485,11 @@ Default: `"10.0.0.0/16"`
 
 The following resources are used by this module:
 
-- [aws_acm_certificate.public](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/acm_certificate) (resource)
-- [aws_acm_certificate_validation.public](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/acm_certificate_validation) (resource)
-- [aws_eip.nginx_ingress](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/eip) (resource)
-- [aws_route53_record.public_validation](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/route53_record) (resource)
-- [aws_route53_record.web_dns_record](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/resources/route53_record) (resource)
+- [aws_acm_certificate.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) (resource)
+- [aws_acm_certificate_validation.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) (resource)
+- [aws_eip.nginx_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) (resource)
+- [aws_route53_record.public_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) (resource)
+- [aws_route53_record.web_dns_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) (resource)
 - [helm_release.nginx_ingress](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.uptycs_edr](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
 - [helm_release.vault_secrets_operator](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
@@ -520,12 +520,12 @@ The following resources are used by this module:
 - [vault_mount.webapp](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/mount) (resource)
 - [vault_namespace.namespace](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/namespace) (resource)
 - [vault_policy.apps_policy](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/policy) (resource)
-- [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/availability_zones) (data source)
-- [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/caller_identity) (data source)
-- [aws_ec2_instance_type_offerings.supported](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/ec2_instance_type_offerings) (data source)
-- [aws_iam_session_context.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/iam_session_context) (data source)
-- [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/partition) (data source)
-- [aws_route53_zone.demo](https://registry.terraform.io/providers/hashicorp/aws/6.37.0/docs/data-sources/route53_zone) (data source)
+- [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) (data source)
+- [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) (data source)
+- [aws_ec2_instance_type_offerings.supported](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ec2_instance_type_offerings) (data source)
+- [aws_iam_session_context.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_session_context) (data source)
+- [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) (data source)
+- [aws_route53_zone.demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) (data source)
 
 ## Outputs
 
