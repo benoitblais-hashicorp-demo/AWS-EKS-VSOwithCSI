@@ -49,15 +49,15 @@ This document describes the technical architecture, design decisions, and operat
           │  (csi.vso.hashicorp.com)         │                      │
           │                                  ▼                      │
           │  Pod (static-secrets)      Vault KV read                │
-          │  └─ volumeMount:           (creds/app/config)           │
+          │  └─ volumeMount:           (webapp/app/config)           │
           │     /var/run/secrets/vault                              │
           └─────────────────────────────────────────────────────── ┘
                         │ reads KV secret
           ┌─────────────▼──────────────────┐
           │       HashiCorp Vault            │
           │  Namespace: <demo_id>-ns         │
-          │  KV v2 mount: creds              │
-          │  Secret: creds/app/config        │
+          │  KV v2 mount: webapp              │
+          │  Secret: webapp/app/config        │
           │    message: "Try VSO by..."      │
           │    image_url: "/resources/..."   │
           └──────────────────────────────── ┘
@@ -78,8 +78,8 @@ Resources provisioned:
 | `module.vpc` | AWS VPC, private/public subnets across up to 3 AZs, NAT Gateway |
 | `module.eks` | EKS cluster v1.34, managed node group, core addons |
 | `vault_namespace.namespace` | Isolated Vault namespace scoped to this demo |
-| `vault_mount.credentials` | KV v2 secrets engine mounted at `creds` |
-| `vault_generic_secret.credentials` | Static secret at `creds/app/config` |
+| `vault_mount.webapp` | KV v2 secrets engine mounted at `webapp` |
+| `vault_generic_secret.webapp` | Static secret at `webapp/app/config` |
 
 After Step 1, the AWS infrastructure is provisioned and the initial Vault secret is populated.
 
@@ -100,7 +100,7 @@ Resources provisioned:
 | `vault_auth_backend.kube_auth` | Vault Kubernetes auth backend |
 | `vault_kubernetes_auth_backend_config.kube_auth_cfg` | Configured with EKS CA cert and endpoint |
 | `vault_kubernetes_auth_backend_role.simple_app_role` | Role `simple-app` bound to `vault-auth` service account |
-| `vault_policy.apps_policy` | Policy granting read access to `creds/*` |
+| `vault_policy.apps_policy` | Policy granting read access to `webapp/*` |
 
 After Step 2, the VSO operator is running with the CSI driver sidecar, and Vault Kubernetes authentication is fully wired.
 
@@ -110,7 +110,7 @@ Resources provisioned:
 
 | Resource | Description |
 | --- | --- |
-| `kubernetes_manifest.vault_csi_secret` | `CSISecrets` CR referencing `creds/app/config` |
+| `kubernetes_manifest.vault_csi_secret` | `CSISecrets` CR referencing `webapp/app/config` |
 | `kubernetes_deployment_v1.static_app` | Go web app (`drum0r/demo-go-web:v1.1.0`), 3 replicas |
 | `kubernetes_service_v1.static_app` | ClusterIP service exposing port 8080 |
 | `kubernetes_ingress_v1.apps` | Ingress rule routing `/` to the static app |
@@ -161,7 +161,7 @@ spec:
   vaultAuthRef: default
   secrets:
     vaultStaticSecrets:
-      - mount: creds
+      - mount: webapp
         path: app/config
         metadata:
           name: app-config
@@ -175,7 +175,7 @@ When a pod references the CSI driver with `csiSecretsName: csi-secret`, VSO auth
 
 ### What Happens When a Secret is Rotated
 
-When the Vault secret at `creds/app/config` is updated (e.g., `message` field changed), the following sequence occurs:
+When the Vault secret at `webapp/app/config` is updated (e.g., `message` field changed), the following sequence occurs:
 
 1. **Vault stores the new secret version.** KV v2 retains previous versions; the new version becomes the current default.
 2. **VSO detects the change.** The VSO operator continuously reconciles `CSISecrets` resources and polls Vault for updates based on its refresh interval.
@@ -188,7 +188,7 @@ When the Vault secret at `creds/app/config` is updated (e.g., `message` field ch
 To demonstrate secret rotation in the live demo:
 
 1. Navigate to the Vault UI using the `vault_address` output and switch to the namespace shown in `vault_namespace`.
-2. Go to **Secrets > creds > app/config** and click **Create new version**.
+2. Go to **Secrets > webapp > app/config** and click **Create new version**.
 3. Update the `message` field to a new value and save.
 4. Observe that the running web application still shows the old value (CSI volume is not live-reloaded).
 5. Delete one or more pods to trigger a restart: `kubectl rollout restart deployment/static-secrets -n simple-app`.

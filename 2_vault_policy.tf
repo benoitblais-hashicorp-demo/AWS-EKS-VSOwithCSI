@@ -7,7 +7,7 @@ resource "vault_policy" "apps_policy" {
   name       = "apps-policy"
 
   policy = <<EOT
-path "${vault_mount.credentials.path}/*" {
+path "${vault_mount.webapp.path}/*" {
   capabilities = ["create", "read", "update", "patch", "list"]
 }
 

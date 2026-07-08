@@ -36,7 +36,7 @@ making it easy to walk through the architecture live or use it as a training env
 - **AWS networking:** VPC, private and public subnets, Internet Gateway, NAT Gateway.
 - **Compute:** EKS cluster with a managed node group (t3.medium, 1–3 nodes).
 - **Ingress:** nginx ingress controller, AWS NLB, 3 pre-allocated Elastic IPs.
-- **Vault:** Namespace, KV v2 mount (`creds`), static secret (`creds/app/config`), Kubernetes
+- **Vault:** Namespace, KV v2 mount (`webapp`), static secret (`webapp/app/config`), Kubernetes
   auth backend, role, and policy.
 - **VSO:** Helm release v1.3.0 with the CSI driver side-car enabled (`csi.enabled: true`).
 - **Kubernetes workload:** `CSISecrets` CR, deployment (3 replicas), ClusterIP service, ingress rule.
@@ -46,7 +46,7 @@ making it easy to walk through the architecture live or use it as a training env
 ## How this demo works
 
 1. Terraform provisions the AWS VPC and the EKS cluster (Step 1).
-2. Terraform creates a Vault namespace and a static KV v2 secret (`creds/app/config`) with a
+2. Terraform creates a Vault namespace and a static KV v2 secret (`webapp/app/config`) with a
    `message` and `image_url` field (Step 1).
 3. Terraform deploys the VSO Helm chart with the CSI driver enabled. The CSI driver registers
    the `csi.vso.hashicorp.com` storage driver on each node (Step 2).
@@ -94,7 +94,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 4. Confirm the Vault secret was created:
    - Open the **Vault UI** using the `vault_address` output.
    - Switch to the namespace shown in the `vault_namespace` output.
-   - Navigate to **Secrets → creds → app/config** and verify the secret exists.
+   - Navigate to **Secrets → webapp → app/config** and verify the secret exists.
 
 ### Step 2 — Deploy Kubernetes tooling
 
@@ -117,7 +117,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
    - Click the **Resources** tab → **Workloads → Deployments**.
    - Filter by namespace `simple-app` and verify `static-secrets` shows **3/3** pods ready.
 4. Open the demo website using the `website` Terraform output (`http://<elastic-ip>`).
-5. The page displays the `message` value stored in Vault (`creds/app/config`).
+5. The page displays the `message` value stored in Vault (`webapp/app/config`).
 
 ### Important behavior
 
@@ -130,7 +130,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 Once the application is running, it is helpful to explain how the configuration pieces fit together to enable the CSI integration:
 
 1. **Vault Policy (`2_vault_policy.tf`)**:
-   Show the `apps-policy` in Vault. Explain that this policy grants read-only access strictly to the `creds/*` path where the application's secret resides.
+   Show the `apps-policy` in Vault. Explain that this policy grants read-only access strictly to the `webapp/*` path where the application's secret resides.
 2. **Kubernetes Auth Method (`2_vault_kube.tf`)**:
    Explain how Vault is configured to trust the EKS cluster. Show the `simple-app` role in Vault, which ties the `apps-policy` to the specific Kubernetes service account (`vault-auth`) and namespace (`simple-app`), enforcing strict identity mapping.
 3. **Vault Secrets Operator Helm Chart (`2_kube_vso.tf`)**:
@@ -151,7 +151,7 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 
 1. Open the Vault UI using the `vault_address` output.
 2. Switch to the namespace shown in the `vault_namespace` output.
-3. Navigate to **Secrets > creds > app/config** and click **Create new version**.
+3. Navigate to **Secrets > webapp > app/config** and click **Create new version**.
 4. Change the `message` field to a new value (for example:
    `"Secret rotation in action — version 2!"`).
 5. Save the new version.
@@ -234,7 +234,7 @@ The Vault token or dynamic credential used by Terraform must have the following 
 
 - Create and manage namespaces (`sys/namespaces/*`).
 - Enable and configure secret engines (`sys/mounts/*`).
-- Create and update KV v2 secrets (`<namespace>/creds/*`).
+- Create and update KV v2 secrets (`<namespace>/webapp/*`).
 - Enable and configure the Kubernetes auth backend (`sys/auth/*`, `auth/kubernetes/*`).
 - Create and manage Vault policies (`sys/policies/acl/*`).
 

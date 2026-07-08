@@ -142,7 +142,7 @@ path "+/auth/kubernetes/*" {
   capabilities = ["create", "read", "update", "delete", "list"]
 }
 
-path "+/creds/*" {
+path "+/webapp/*" {
   capabilities = ["create", "read", "update", "delete", "list"]
 }
 ```
