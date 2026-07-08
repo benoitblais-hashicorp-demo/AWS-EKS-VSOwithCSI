@@ -15,7 +15,7 @@ provider "aws" {
       hc-repo                = "github.com/benoitblais-hashicorp-demo/AWS-EKS-VSOwithCSI"
       hc-owner               = "benoit.blais@hashicorp.com"
       cdl-customer-name      = var.customer_name
-      cdl-name               = local.demo_name
+      cdl-name               = "vso-csi"
       cdl-ddr-workspace-slug = var.TFC_WORKSPACE_NAME
       cdl-ddr-project        = var.TFC_PROJECT_NAME
       environment            = var.environment
