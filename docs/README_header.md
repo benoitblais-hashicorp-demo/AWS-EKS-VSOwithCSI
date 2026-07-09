@@ -152,7 +152,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
    - Open the **AWS Console → EKS → Clusters → <resources_prefix>-<random_id>-eks**.
    - Click the **Resources** tab → **Workloads → Deployments**.
    - Filter by namespace `demo-go-web-vso-csi` and verify `demo-webapp` shows **3/3** pods ready.
-4. Open the demo website using the `website` Terraform output (`http://<elastic-ip>`).
+4. Open the demo website using the `website` Terraform output (e.g. `https://<demo_subdomain>.<public_hosted_zone>`).
 5. The page displays the `message` value stored in Vault (`webapp/app/config`).
 
 ### Important behavior
