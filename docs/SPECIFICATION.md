@@ -43,24 +43,24 @@ This document describes the technical architecture, deployment sequence, and des
           │  └────────────────────────────────────┘  │
           └───────────────────────────────────────── ┘
                         │ step_3
-          ┌─────────────▼─────────────────────────────────────────┐
-          │          Kubernetes (EKS) — Application Layer           │
-          │                                                         │
-          │  CSISecrets CR ──────────────► VSO CSI Driver           │
-          │  (csi.vso.hashicorp.com)         │                      │
-          │                                  ▼                      │
-          │  Pod (demo-webapp)      Vault KV read                │
-          │  └─ volumeMount:           (webapp/app/config)           │
-          │     /var/run/secrets/vault                              │
-          └─────────────────────────────────────────────────────── ┘
+          ┌─────────────▼───────────────────────────────────┐
+          │          Kubernetes (EKS) — Application Layer   │
+          │                                                 │
+          │  CSISecrets CR ──────────────► VSO CSI Driver   │
+          │  (csi.vso.hashicorp.com)         │              │
+          │                                  ▼              │
+          │  Pod (demo-webapp)      Vault KV read           │
+          │  └─ volumeMount:           (webapp/app/config)  │
+          │     /var/run/secrets/vault                      │
+          └──────────────────────────────────────────────── ┘
                         │ reads KV secret
-          ┌─────────────▼──────────────────┐
-          │       HashiCorp Vault            │
-          │  Namespace: <demo_id>-ns         │
-          │  KV v2 mount: webapp              │
-          │  Secret: webapp/app/config        │
-          │    message: "Try VSO by..."      │
-          │    image_url: "/resources/..."   │
+          ┌─────────────▼───────────────────┐
+          │       HashiCorp Vault           │
+          │  Namespace: <demo_id>-ns        │
+          │  KV v2 mount: webapp            │
+          │  Secret: webapp/app/config      │
+          │    message: "Try VSO by..."     │
+          │    image_url: "/resources/..."  │
           └──────────────────────────────── ┘
 ```
 
@@ -166,23 +166,6 @@ configured Vault run role (`TFC_VAULT_RUN_ROLE`), avoiding long-lived static Vau
 | Workspace identity authentication | Uses JWT/OIDC workload identity for Vault and dynamic AWS credentials from HCP Terraform |
 | 3 Elastic IPs for NLB | Required by AWS NLB with internet-facing scheme across 3 AZs |
 | `sensitive = true` on `kubernetes_info` output | Prevents the kubeconfig update command from appearing in HCP Terraform plan logs |
-
----
-
-## Provider Versions
-
-| Provider | Version |
-| --- | --- |
-| `hashicorp/aws` | `6.37.0` |
-| `hashicorp/vault` | `5.8.0` |
-| `hashicorp/helm` | `3.1.1` |
-| `hashicorp/kubernetes` | `3.0.1` |
-| `hashicorp/random` | `3.8.1` |
-| `hashicorp/time` | `0.13.1` |
-| `hashicorp/tls` | `4.2.1` |
-| `hashicorp/null` | `3.2.4` |
-
-Terraform required version: `>= 1.5.0`
 
 ---
 
