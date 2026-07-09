@@ -25,7 +25,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 ├── providers.tf          # Provider configurations
 ├── variables.tf          # Input variable definitions (alphabetical order)
 ├── variables_providers.tf # Dynamic credential variables (currently commented out)
-├── 1_locals.tf           # Local values and AZ discovery (Step 1)
+├── 1_locals.tf           # Randomized global identifiers and prefixes (Step 1)
 ├── 1_aws_network.tf      # VPC and subnet provisioning (Step 1)
 ├── 1_aws_eks.tf          # EKS cluster and node groups (Step 1)
 ├── 1_vault_ns.tf         # Vault namespace creation (Step 1)
