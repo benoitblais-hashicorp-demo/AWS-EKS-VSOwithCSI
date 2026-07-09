@@ -39,7 +39,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 ├── 2_vault_policy.tf     # Vault policy for app access (Step 2)
 ├── 3_starting.tf         # Step 3 gate (time_sleep dependency guard)
 ├── 3_kube_ingress.tf     # Kubernetes ingress rule (Step 3)
-├── 3_kube_static_app.tf  # CSISecrets CRD, deployment, service, automation (Step 3)
+├── 3_kube_static_app.tf  # CSISecrets CRD, deployment (demo-webapp), service, automation (Step 3)
 ├── docs/
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
