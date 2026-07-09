@@ -6,6 +6,18 @@ This demo provisions a production-oriented AWS environment to show how HashiCorp
 can be delivered **directly into Kubernetes pods** via the Vault Secrets Operator (VSO) CSI
 provider — without ever storing them as Kubernetes `Secret` objects.
 
+## Demo Value Proposition
+
+- Demonstrates **zero Kubernetes Secrets for application secrets**: the Vault secret never becomes
+  a `Secret` object in the Kubernetes API server.
+- Shows **Vault as the single source of truth**: secrets are read at pod startup from Vault,
+  not from a cached copy.
+- Illustrates **deliberate, auditable secret rotation**: when a Vault secret is updated, running
+  pods continue to use the prior version until they are restarted — giving operators full control
+  over the rotation window.
+- Provides a **reusable baseline** for enterprise patterns: dynamic Vault credentials, KV v2
+  versioning, least-privilege Vault policies, and private EKS node placement.
+
 ## Demo Components
 
 - **AWS Networking:** VPC with private/public subnets across multiple Availability Zones, Internet Gateway, and NAT-based outbound connectivity for EKS worker nodes.
@@ -66,6 +78,18 @@ spec:
 
 When a pod references the CSI driver with `csiSecretsName: csi-secret`, VSO authenticates to Vault, retrieves the KV secret, and injects it into the pod's ephemeral volume at mount time.
 
+## Secret Rotation
+
+### What Happens When a Secret is Rotated
+
+When the Vault secret at `webapp/app/config` is updated (e.g., `message` field changed), the following sequence occurs:
+
+1. **Vault stores the new secret version.** KV v2 retains previous versions; the new version becomes the current default.
+2. **VSO detects the change.** The VSO operator continuously reconciles `CSISecrets` resources and polls Vault for updates based on its refresh interval.
+3. **VSO updates the CSI node staging.** The updated secret data is written to the ephemeral CSI staging area on the node.
+4. **Running pods do NOT automatically pick up the change.** Because the secret is a CSI volume (not a projected volume), running pods continue to see the original data.
+5. **After a pod restart, the new secret is visible.** When a pod is restarted (rolling update, node eviction, or manual deletion), the new CSI volume is mounted with the current Vault secret.
+
 ## How this demo works
 
 1. Terraform provisions the AWS VPC and the EKS cluster (Step 1).
@@ -81,31 +105,6 @@ When a pod references the CSI driver with `csiSecretsName: csi-secret`, VSO auth
    the driver authenticates to Vault, retrieves the secret, and writes the data as files into
    the pod's ephemeral volume at `/var/run/secrets/vault` (Step 3).
 7. The web application reads the secret files and renders the `message` field on the demo page.
-
-## Demo Value Proposition
-
-- Demonstrates **zero Kubernetes Secrets for application secrets**: the Vault secret never becomes
-  a `Secret` object in the Kubernetes API server.
-- Shows **Vault as the single source of truth**: secrets are read at pod startup from Vault,
-  not from a cached copy.
-- Illustrates **deliberate, auditable secret rotation**: when a Vault secret is updated, running
-  pods continue to use the prior version until they are restarted — giving operators full control
-  over the rotation window.
-- Provides a **reusable baseline** for enterprise patterns: dynamic Vault credentials, KV v2
-  versioning, least-privilege Vault policies, and private EKS node placement.
-
-
-## Secret Rotation
-
-### What Happens When a Secret is Rotated
-
-When the Vault secret at `webapp/app/config` is updated (e.g., `message` field changed), the following sequence occurs:
-
-1. **Vault stores the new secret version.** KV v2 retains previous versions; the new version becomes the current default.
-2. **VSO detects the change.** The VSO operator continuously reconciles `CSISecrets` resources and polls Vault for updates based on its refresh interval.
-3. **VSO updates the CSI node staging.** The updated secret data is written to the ephemeral CSI staging area on the node.
-4. **Running pods do NOT automatically pick up the change.** Because the secret is a CSI volume (not a projected volume), running pods continue to see the original data.
-5. **After a pod restart, the new secret is visible.** When a pod is restarted (rolling update, node eviction, or manual deletion), the new CSI volume is mounted with the current Vault secret.
 
 ## How to Conduct the Demo
 
@@ -179,11 +178,11 @@ Once the application is running, it is helpful to explain how the configuration 
 5. **Pod Volume Mount (`3_kube_static_app.tf`)**:
    Show the deployment specification. The pod utilizes the `csi.vso.hashicorp.com` storage driver for its volume and passes the `csiSecretsName` attribute. This is how Kubernetes natively mounts the ephemeral secret file into the pod without ever creating a traditional Kubernetes `Secret` object.
 
-## Secret Rotation Demo
+### Secret Rotation Demo
 
 This section walks through the deliberate secret rotation pattern that VSO + CSI enables.
 
-### Rotate the secret in Vault
+#### Rotate the secret in Vault
 
 1. Open the Vault UI using the `vault_address` output.
 2. Switch to the namespace shown in the `vault_namespace` output.
@@ -192,14 +191,14 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
    `"Secret rotation in action — version 2!"`).
 5. Save the new version.
 
-### Observe the behavior
+#### Observe the behavior
 
 1. Reload the demo web application — the **original message is still displayed**. This is expected:
    the CSI volume is bound to the pod at startup and is not live-reloaded while the pod is running.
    Vault still holds the updated secret, but the running pod retains the prior version in its
    ephemeral volume.
 
-### Apply the rotation to running pods
+#### Apply the rotation to running pods
 
 1. In the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**, go to the
    **Resources** tab → **Workloads → Pods**, filter by namespace `demo-go-web-vso-csi`.
@@ -209,7 +208,7 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
    the current secret version, and injects the new data into the pod's ephemeral volume.
 4. Reload the demo web application — the **new message from Vault is now displayed**.
 
-### What this demonstrates
+#### What this demonstrates
 
 - The pod lifecycle controls the rotation window, giving operators a deliberate and auditable
   change boundary.
