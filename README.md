@@ -127,7 +127,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 1. Set `step_2 = false` and `step_3 = false` (default values).
 2. Trigger Run #1.
 3. Confirm the EKS cluster is healthy:
-   - Open the **AWS Console → EKS → Clusters** and verify `hashicat-inc-ynfyas-eks` shows **Active** status.
+   - Open the **AWS Console → EKS → Clusters** and verify `<resources_prefix>-<random_id>-eks` (e.g. `vso-csi-a1b2-eks`) shows **Active** status.
 4. Confirm the Vault secret was created:
    - Open the **Vault UI** using the `vault_address` output.
    - Switch to the namespace shown in the `vault_namespace` output.
@@ -138,7 +138,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 1. Set `step_2 = true` in the workspace variables.
 2. Trigger Run #2.
 3. Confirm the VSO pod is running:
-   - Open the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**.
+   - Open the **AWS Console → EKS → Clusters → <resources\_prefix>-<random\_id>-eks** (e.g. `vso-csi-a1b2-eks`).
    - Click the **Resources** tab → **Workloads → Pods**.
    - Filter by namespace `demo-go-web-vso-csi` and verify a `vault-secrets-operator-*` pod shows **Running** status.
 4. Confirm the VSO CSI driver is registered:
@@ -150,7 +150,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 1. Set `step_3 = true` in the workspace variables.
 2. Trigger Run #3.
 3. Confirm all 3 replicas are ready:
-   - Open the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**.
+   - Open the **AWS Console → EKS → Clusters → <resources\_prefix>-<random\_id>-eks**.
    - Click the **Resources** tab → **Workloads → Deployments**.
    - Filter by namespace `demo-go-web-vso-csi` and verify `demo-webapp` shows **3/3** pods ready.
 4. Open the demo website using the `website` Terraform output (`http://<elastic-ip>`).
@@ -202,7 +202,7 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 
 #### Apply the rotation to running pods
 
-1. In the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**, go to the
+1. In the **AWS Console → EKS → Clusters → <resources\_prefix>-<random\_id>-eks**, go to the
    **Resources** tab → **Workloads → Pods**, filter by namespace `demo-go-web-vso-csi`.
 2. Select all `demo-webapp-*` pods and delete them (one at a time or all at once).
    The deployment controller will immediately schedule replacement pods.
