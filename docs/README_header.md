@@ -102,7 +102,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 3. Confirm the VSO pod is running:
    - Open the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**.
    - Click the **Resources** tab → **Workloads → Pods**.
-   - Filter by namespace `simple-app` and verify a `vault-secrets-operator-*` pod shows **Running** status.
+   - Filter by namespace `demo-go-web-vso-csi` and verify a `vault-secrets-operator-*` pod shows **Running** status.
 4. Confirm the VSO CSI driver is registered:
    - In the same **Resources** tab, navigate to **Storage → CSI Drivers**.
    - Verify `csi.vso.hashicorp.com` appears in the list.
@@ -114,7 +114,7 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 3. Confirm all 3 replicas are ready:
    - Open the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**.
    - Click the **Resources** tab → **Workloads → Deployments**.
-   - Filter by namespace `simple-app` and verify `static-secrets` shows **3/3** pods ready.
+   - Filter by namespace `demo-go-web-vso-csi` and verify `demo-webapp` shows **3/3** pods ready.
 4. Open the demo website using the `website` Terraform output (`http://<elastic-ip>`).
 5. The page displays the `message` value stored in Vault (`webapp/app/config`).
 
@@ -131,7 +131,7 @@ Once the application is running, it is helpful to explain how the configuration 
 1. **Vault Policy (`2_vault_policy.tf`)**:
    Show the `apps-policy` in Vault. Explain that this policy grants read-only access strictly to the `webapp/*` path where the application's secret resides.
 2. **Kubernetes Auth Method (`2_vault_kube.tf`)**:
-   Explain how Vault is configured to trust the EKS cluster. Show the `simple-app` role in Vault, which ties the `apps-policy` to the specific Kubernetes service account (`vault-auth`) and namespace (`simple-app`), enforcing strict identity mapping.
+   Explain how Vault is configured to trust the EKS cluster. Show the `demo-go-web-vso-csi` role in Vault, which ties the `apps-policy` to the specific Kubernetes service account (`vault-auth`) and namespace (`demo-go-web-vso-csi`), enforcing strict identity mapping.
 3. **Vault Secrets Operator Helm Chart (`2_kube_vso.tf`)**:
    Highlight the `values.yaml` configuration where the CSI driver is enabled (`csi.enabled: true`) and default Vault connection methods are disabled to enforce explicit authorization via Custom Resources.
 4. **CSISecrets Custom Resource (`3_kube_static_app.tf`)**:
@@ -165,8 +165,8 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 ### Apply the rotation to running pods
 
 1. In the **AWS Console → EKS → Clusters → hashicat-inc-ynfyas-eks**, go to the
-   **Resources** tab → **Workloads → Pods**, filter by namespace `simple-app`.
-2. Select all `static-secrets-*` pods and delete them (one at a time or all at once).
+   **Resources** tab → **Workloads → Pods**, filter by namespace `demo-go-web-vso-csi`.
+2. Select all `demo-webapp-*` pods and delete them (one at a time or all at once).
    The deployment controller will immediately schedule replacement pods.
 3. As each replacement pod starts, the VSO CSI driver re-authenticates to Vault, reads
    the current secret version, and injects the new data into the pod's ephemeral volume.

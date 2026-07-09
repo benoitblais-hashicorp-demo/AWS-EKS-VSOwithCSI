@@ -1,0 +1,20 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: CSISecrets
+metadata:
+  name: csi-secret
+  namespace: demo-go-web-vso-csi
+spec:
+  namespace: admin/some-hashicat-inc-secrets-operator-ns
+  accessControl:
+    serviceAccountPattern: ".*"
+    namespacePatterns:
+      - ".*"
+  vaultAuthRef:
+    name: default
+    namespace: demo-go-web-vso-csi
+  secrets:
+    vaultStaticSecrets:
+      - mount: creds
+        type: kv-v2
+        path: app/config
+        refreshAfter: 5s
