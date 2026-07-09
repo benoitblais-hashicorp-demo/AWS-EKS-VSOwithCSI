@@ -113,12 +113,11 @@ When the Vault secret at `webapp/app/config` is updated (e.g., `message` field c
 Before provisioning, configure the workspace with the required inputs:
 
 1. Terraform variable `vault_address` (required).
-2. Terraform variable `doormat_username` (required).
-3. Terraform variables `owner` (required).
-5. Terraform variables `repository` (required).
-6. HCP Terraform AWS Dynamic Provider Credentials enabled for the workspace (`TFC_AWS_PROVIDER_AUTH=true` and `TFC_AWS_RUN_ROLE_ARN` set).
-7. HCP Terraform Vault provider authentication enabled with JWT/OIDC (`TFC_VAULT_PROVIDER_AUTH=true`).
-8. Vault auth context variables set in the workspace (`TFC_VAULT_ADDR`, `TFC_VAULT_NAMESPACE`, `TFC_VAULT_RUN_ROLE`, and optional `TFC_VAULT_AUTH_PATH`).
+2. Terraform variables `owner` and `repository` (optional, but highly recommended for resource tagging).
+3. Terraform variable `doormat_username` (optional, but recommended to grant your AWS SSO role access to the EKS cluster).
+4. HCP Terraform AWS Dynamic Provider Credentials enabled for the workspace (`TFC_AWS_PROVIDER_AUTH=true` and `TFC_AWS_RUN_ROLE_ARN` set).
+5. HCP Terraform Vault provider authentication enabled with JWT/OIDC (`TFC_VAULT_PROVIDER_AUTH=true`).
+6. Vault auth context variables set in the workspace (`TFC_VAULT_ADDR`, `TFC_VAULT_NAMESPACE`, `TFC_VAULT_RUN_ROLE`, and optional `TFC_VAULT_AUTH_PATH`).
 
 After variables are configured, trigger runs from the workspace (VCS-driven) or via CLI-driven apply if your workflow uses local execution.
 
