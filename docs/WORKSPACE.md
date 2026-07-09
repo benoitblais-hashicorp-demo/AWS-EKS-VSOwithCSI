@@ -19,7 +19,9 @@ Set these in the workspace under **Variables → Terraform variables**.
 
 | Variable | Default | Sensitive | Description |
 | --- | --- | --- | --- |
-| `customer_name` | `""` | No | Short name for the customer. Used to prefix all provisioned resources. Lowercase letters, numbers, and hyphens only, 50 characters maximum. |
+| `owner` | `"user@example.com"` | No | Owner identifier (e.g., email) used for AWS tagging. |
+| `repository` | `"github.com/hashicorp/terraform-demo"` | No | URL of the repository where the codebase resides. |
+| `customer_name` | `"hashicat"` | No | Short name for the customer. Used to prefix all provisioned resources. Lowercase letters, numbers, and hyphens only, 50 characters maximum. |
 | `doormat_username` | `""` | No | Doormat username used to construct the IAM developer role ARN (`arn:aws:iam::<account_id>:role/aws_<doormat_username>-developer`). When set, adds the role as a KMS key administrator and EKS access entry. Leave empty to omit. |
 | `instance_type` | `t3.medium` | No | EC2 instance type for the EKS managed node group. Allowed values: `t3.medium`, `t3.large`, `t3.xlarge`, `m6i.large`, `m6i.xlarge`, `m6a.large`, `m6a.xlarge`. |
 | `region` | `ca-central-1` | No | AWS region where all resources are provisioned. |
