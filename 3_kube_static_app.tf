@@ -18,17 +18,17 @@ apiVersion: secrets.hashicorp.com/v1beta1
 kind: CSISecrets
 metadata:
   name: csi-secret
-  namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
+  namespace: ${kubernetes_namespace_v1.demo_app[0].metadata.0.name}
 spec:
   namespace: ${trim(vault_namespace.namespace.id, "/")}
   accessControl:
     matchPolicy: any
     serviceAccountPattern: "${kubernetes_service_account_v1.vault[0].metadata.0.name}"
     namespacePatterns:
-      - "${kubernetes_namespace_v1.simple_app[0].metadata.0.name}"
+      - "${kubernetes_namespace_v1.demo_app[0].metadata.0.name}"
   vaultAuthRef:
     name: default
-    namespace: ${kubernetes_namespace_v1.simple_app[0].metadata.0.name}
+    namespace: ${kubernetes_namespace_v1.demo_app[0].metadata.0.name}
   secrets:
     vaultStaticSecrets:
       - mount: ${vault_mount.webapp.path}
@@ -48,7 +48,7 @@ resource "kubernetes_deployment_v1" "static_app" {
   ]
   metadata {
     name      = "static-secrets"
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
 
   spec {
@@ -133,7 +133,7 @@ resource "kubernetes_deployment_v1" "static_app" {
             driver    = "csi.vso.hashicorp.com"
             volume_attributes = {
               csiSecretsName      = "csi-secret"
-              csiSecretsNamespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+              csiSecretsNamespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
             }
           }
         }
@@ -149,7 +149,7 @@ resource "kubernetes_service_v1" "static_app" {
   depends_on = [time_sleep.step_3]
   metadata {
     name      = kubernetes_deployment_v1.static_app[0].metadata.0.name
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
 
   spec {
@@ -171,7 +171,7 @@ resource "kubernetes_service_account_v1" "restarter" {
   depends_on = [time_sleep.step_3]
   metadata {
     name      = "pod-restarter"
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
 }
 
@@ -180,7 +180,7 @@ resource "kubernetes_role_v1" "restarter" {
   depends_on = [time_sleep.step_3]
   metadata {
     name      = "pod-restarter"
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
   rule {
     api_groups = ["apps"]
@@ -194,7 +194,7 @@ resource "kubernetes_role_binding_v1" "restarter" {
   depends_on = [time_sleep.step_3]
   metadata {
     name      = "pod-restarter"
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
@@ -204,7 +204,7 @@ resource "kubernetes_role_binding_v1" "restarter" {
   subject {
     kind      = "ServiceAccount"
     name      = kubernetes_service_account_v1.restarter[0].metadata.0.name
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
 }
 
@@ -213,7 +213,7 @@ resource "kubernetes_cron_job_v1" "restarter" {
   depends_on = [time_sleep.step_3]
   metadata {
     name      = "static-secrets-restarter"
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
   spec {
     schedule = "* * * * *"
