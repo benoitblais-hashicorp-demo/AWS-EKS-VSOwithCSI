@@ -43,6 +43,56 @@ making it easy to walk through the architecture live or use it as a training env
 - **RBAC:** `vault-auth` service account, long-lived token secret, `system:auth-delegator` cluster
   role binding.
 
+## Secret Delivery Mechanism
+
+### How Secrets Reach the Pod
+
+The VSO CSI integration delivers secrets as ephemeral volume files mounted into the pod filesystem. The flow is:
+
+```text
+Vault KV Secret
+      │
+      ▼
+VSO reads secret using Kubernetes auth (service account JWT token)
+      │
+      ▼
+VSO CSI Driver (csi.vso.hashicorp.com) writes secret data to ephemeral volume
+      │
+      ▼
+Pod mounts volume at /var/run/secrets/vault
+      │
+      ▼
+Application reads secret as a file (e.g., /var/run/secrets/vault/message)
+```
+
+Key properties:
+
+- **No Kubernetes Secret object is created.** The secret data never enters the Kubernetes API server as a persistent object.
+- **Secret data is ephemeral.** The CSI volume exists only for the lifetime of the pod. When the pod terminates, the mounted secret data is removed.
+- **Vault is the single source of truth.** The application always reads from a Vault-backed volume, not a cached copy.
+
+### CSISecrets Custom Resource
+
+The `CSISecrets` custom resource (CRD installed by VSO) declares which Vault paths should be surfaced by the CSI driver:
+
+```yaml
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: CSISecrets
+metadata:
+  name: csi-secret
+  namespace: demo-go-web-vso-csi
+spec:
+  vaultAuthRef: default
+  secrets:
+    vaultStaticSecrets:
+      - mount: webapp
+        path: app/config
+        metadata:
+          name: app-config
+```
+
+When a pod references the CSI driver with `csiSecretsName: csi-secret`, VSO authenticates to Vault, retrieves the KV secret, and injects it into the pod's ephemeral volume at mount time.
+
 ## How this demo works
 
 1. Terraform provisions the AWS VPC and the EKS cluster (Step 1).
@@ -70,6 +120,18 @@ making it easy to walk through the architecture live or use it as a training env
   over the rotation window.
 - Provides a **reusable baseline** for enterprise patterns: dynamic Vault credentials, KV v2
   versioning, least-privilege Vault policies, and private EKS node placement.
+
+## Secret Rotation
+
+### What Happens When a Secret is Rotated
+
+When the Vault secret at `webapp/app/config` is updated (e.g., `message` field changed), the following sequence occurs:
+
+1. **Vault stores the new secret version.** KV v2 retains previous versions; the new version becomes the current default.
+2. **VSO detects the change.** The VSO operator continuously reconciles `CSISecrets` resources and polls Vault for updates based on its refresh interval.
+3. **VSO updates the CSI node staging.** The updated secret data is written to the ephemeral CSI staging area on the node.
+4. **Running pods do NOT automatically pick up the change.** Because the secret is a CSI volume (not a projected volume), running pods continue to see the original data.
+5. **After a pod restart, the new secret is visible.** When a pod is restarted (rolling update, node eviction, or manual deletion), the new CSI volume is mounted with the current Vault secret.
 
 ## How to Conduct the Demo
 
