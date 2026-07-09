@@ -15,7 +15,7 @@ provider "aws" {
       hc-repo                = var.repository
       hc-owner               = var.owner
       cdl-customer-name      = var.customer_name
-      cdl-name               = "vso-csi"
+      cdl-name               = var.resources_prefix
       cdl-ddr-workspace-slug = var.TFC_WORKSPACE_NAME
       cdl-ddr-project        = var.TFC_PROJECT_NAME
       environment            = var.environment
