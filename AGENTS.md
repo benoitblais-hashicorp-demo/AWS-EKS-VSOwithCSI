@@ -47,8 +47,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 │   ├── README_footer.md
 │   ├── README_header.md
 │   ├── SECURITY.md
-│   ├── SPECIFICATION.md  # Technical architecture and design decisions
-│   └── WORKSPACE.md      # HCP Terraform workspace variable/auth configuration
+│   └── SPECIFICATION.md  # Technical architecture and design decisions
 ```
 
 ### Required Files and Directories
@@ -57,7 +56,6 @@ This project uses a numbered file naming convention to reflect the three deploym
 - `docs/README_header.md` – Describe the purpose of the demo, key features, permissions, and authentication.
 - `docs/README_footer.md` – External documentation links used to develop the code.
 - `docs/SPECIFICATION.md` – Technical architecture, design decisions, and demo flow documentation.
-- `docs/WORKSPACE.md` – Required workspace variables and authentication configuration for HCP Terraform.
 - `terraform.tf` – Terraform version and provider requirements (`required_version`, `required_providers`).
 - `providers.tf` – Provider configurations (AWS, Vault, Helm, Kubernetes).
 - `outputs.tf` – Output value definitions (alphabetical order).
