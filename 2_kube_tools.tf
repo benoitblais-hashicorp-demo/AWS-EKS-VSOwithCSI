@@ -1,10 +1,25 @@
 # Copyright IBM Corp. 2024, 2026
 
-resource "kubernetes_namespace_v1" "simple_app" {
+# ==============================================================================
+# KUBERNETES TOOLING & INGRESS INFRASTRUCTURE
+# ==============================================================================
+# This file provisions essential Kubernetes tooling including namespaces for the 
+# application and ingress, AWS Elastic IPs for stable load balancer IP addresses, 
+# the NGINX Ingress Controller Helm chart, and Kubernetes Service Account 
+# resources (RBAC, Secret) required for Vault Kubernetes authentication.
+# This execution is gated by the step_2 variable.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# KUBERNETES NAMESPACES
+# ------------------------------------------------------------------------------
+
+# 1. Create the 'demo-go-web-vso-csi' namespace where the demo application will run
+resource "kubernetes_namespace_v1" "demo_app" {
   count      = var.step_2 ? 1 : 0
   depends_on = [time_sleep.step_2]
   metadata {
-    name = "simple-app"
+    name = "demo-go-web-vso-csi"
     labels = {
       "pod-security.kubernetes.io/enforce" = "privileged"
       "pod-security.kubernetes.io/audit"   = "privileged"
@@ -13,6 +28,7 @@ resource "kubernetes_namespace_v1" "simple_app" {
   }
 }
 
+# 2. Create the 'ingress-nginx' namespace for the Ingress Controller
 resource "kubernetes_namespace_v1" "ingress_nginx" {
   count      = var.step_2 ? 1 : 0
   depends_on = [time_sleep.step_2]
@@ -26,14 +42,20 @@ resource "kubernetes_namespace_v1" "ingress_nginx" {
   }
 }
 
+# ------------------------------------------------------------------------------
+# NGINX INGRESS CONTROLLER & LOAD BALANCING
+# ------------------------------------------------------------------------------
+
+# 3. Provision static AWS Elastic IPs to attach to the Network Load Balancer (NLB)
 resource "aws_eip" "nginx_ingress" {
   count = var.step_2 ? 3 : 0
   depends_on = [
     time_sleep.step_2,
-    kubernetes_namespace_v1.simple_app,
+    kubernetes_namespace_v1.demo_app,
   ]
 }
 
+# 4. Wait temporarily to let AWS API cleanly allocate the EIPs before Helm uses them
 resource "time_sleep" "eip_wait" {
   count = var.step_2 ? 1 : 0
   depends_on = [
@@ -43,6 +65,7 @@ resource "time_sleep" "eip_wait" {
   destroy_duration = "60s"
 }
 
+# 5. Deploy the NGINX Ingress Controller mapped to an AWS NLB using the static EIPs
 resource "helm_release" "nginx_ingress" {
   count = var.step_2 ? 1 : 0
   depends_on = [
@@ -76,22 +99,28 @@ EOT
   ]
 }
 
+# ------------------------------------------------------------------------------
+# VAULT AUTHENTICATION (KUBERNETES SERVICE ACCOUNT & RBAC)
+# ------------------------------------------------------------------------------
+
+# 6. Create the 'vault-auth' Kubernetes Service Account used by the application to authenticate with Vault
 resource "kubernetes_service_account_v1" "vault" {
   count      = var.step_2 ? 1 : 0
   depends_on = [time_sleep.step_2]
   metadata {
     name      = "vault-auth"
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
   automount_service_account_token = true
 }
 
+# 7. Create a long-lived Service Account Token Secret for the Vault auth Service Account
 resource "kubernetes_secret_v1" "vault_token" {
   count      = var.step_2 ? 1 : 0
   depends_on = [time_sleep.step_2]
   metadata {
     name      = kubernetes_service_account_v1.vault[0].metadata.0.name
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
     annotations = {
       "kubernetes.io/service-account.name" = "vault-auth"
     }
@@ -100,6 +129,7 @@ resource "kubernetes_secret_v1" "vault_token" {
   wait_for_service_account_token = true
 }
 
+# 8. Bind the 'system:auth-delegator' ClusterRole to the Service Account so Vault can verify tokens
 resource "kubernetes_cluster_role_binding_v1" "vault" {
   count      = var.step_2 ? 1 : 0
   depends_on = [time_sleep.step_2]
@@ -116,6 +146,6 @@ resource "kubernetes_cluster_role_binding_v1" "vault" {
   subject {
     kind      = "ServiceAccount"
     name      = kubernetes_service_account_v1.vault[0].metadata.0.name
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
 }
