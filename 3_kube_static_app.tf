@@ -5,7 +5,6 @@ resource "kubernetes_manifest" "vault_csi_secret" {
   depends_on = [
     time_sleep.step_3,
     helm_release.vault_secrets_operator,
-    kubernetes_manifest.vault_auth,
     vault_generic_secret.webapp_config,
   ]
 
