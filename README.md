@@ -7,14 +7,6 @@ This demo provisions a production-oriented AWS environment to show how HashiCorp
 can be delivered **directly into Kubernetes pods** via the Vault Secrets Operator (VSO) CSI
 provider — without ever storing them as Kubernetes `Secret` objects.
 
-The demo is structured as a three-step gated deployment. Each step builds on the previous one,
-making it easy to walk through the architecture live or use it as a training environment.
-
-- **Step 1:** AWS VPC, EKS cluster, Vault namespace, and a static KV v2 secret.
-- **Step 2:** Vault Kubernetes auth, VSO Helm chart (CSI driver enabled), nginx ingress, and RBAC.
-- **Step 3:** A `CSISecrets` custom resource and a Go web application that reads Vault secrets
-  from a CSI-mounted volume at `/var/run/secrets/vault`.
-
 ## Features
 
 - AWS VPC with private and public subnets across multiple Availability Zones.
@@ -347,7 +339,7 @@ is required. Workspace variables are used for all provider credentials.
 ## Setup & Deployment
 
 1. Set up an HCP Terraform Workspace connected to your VCS repository.
-2. Configure the required workspace variables and HCP Terraform dynamic credentials (for AWS and Vault) as described in `docs/WORKSPACE.md`.
+2. Configure the required workspace variables and HCP Terraform dynamic credentials (for AWS and Vault).
 3. **Step 1:** Queue a run with `step_2 = false` and `step_3 = false`. This provisions the foundational AWS infrastructure and the Vault namespace.
 4. **Step 2:** Update your workspace variables to set `step_2 = true`. To prevent parallel dependency failures, apply this step on its own to deploy the Kubernetes tooling (Nginx ingress, Uptycs EDR, VSO Helm Chart, Vault Auth).
 5. **Step 3:** Finally, set `step_3 = true` and queue the final run. This deploys the CSISecrets resource and the target application pods.
