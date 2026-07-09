@@ -12,8 +12,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      hc-repo                = "github.com/benoitblais-hashicorp-demo/AWS-EKS-VSOwithCSI"
-      hc-owner               = "benoit.blais@hashicorp.com"
+      hc-repo                = var.repository
+      hc-owner               = var.owner
       cdl-customer-name      = var.customer_name
       cdl-name               = "vso-csi"
       cdl-ddr-workspace-slug = var.TFC_WORKSPACE_NAME

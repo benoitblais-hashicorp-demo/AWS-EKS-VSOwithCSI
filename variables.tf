@@ -72,6 +72,18 @@ variable "public_hosted_zone" {
   default     = "benoit-blais.sbx.hashidemos.io"
 }
 
+variable "owner" {
+  description = "(Optional) Owner identifier (e.g., email) used for tagging."
+  type        = string
+  default     = "user@example.com"
+}
+
+variable "repository" {
+  description = "(Optional) The URL of the repository where the codebase resides."
+  type        = string
+  default     = "github.com/hashicorp/terraform-demo"
+}
+
 variable "region" {
   description = "(Optional) AWS region where all resources are provisioned."
   type        = string
