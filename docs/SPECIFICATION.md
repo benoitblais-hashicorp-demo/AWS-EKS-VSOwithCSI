@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the technical architecture, design decisions, and operational flow for the AWS EKS + VSO + CSI demo. The configuration demonstrates how HashiCorp Vault secrets can be delivered securely and directly into Kubernetes pod workloads using the Vault Secrets Operator (VSO) CSI provider — without ever creating a Kubernetes `Secret` object.
+This document describes the technical architecture, deployment sequence, and design decisions for the AWS EKS + VSO + CSI demo. The configuration demonstrates how HashiCorp Vault secrets can be delivered securely and directly into Kubernetes pod workloads using the Vault Secrets Operator (VSO) CSI provider — without ever creating a Kubernetes `Secret` object.
 
 ---
 
