@@ -6,33 +6,15 @@ This demo provisions a production-oriented AWS environment to show how HashiCorp
 can be delivered **directly into Kubernetes pods** via the Vault Secrets Operator (VSO) CSI
 provider — without ever storing them as Kubernetes `Secret` objects.
 
-## Features
-
-- AWS VPC with private and public subnets across multiple Availability Zones.
-- NAT-based outbound connectivity for EKS worker nodes in private subnets.
-- EKS cluster (v1.34) with a managed node group and core addons (CoreDNS, kube-proxy, VPC CNI,
-  EKS Pod Identity Agent).
-- HashiCorp Vault Kubernetes auth backend wired to the EKS cluster using service account token review.
-- Vault Secrets Operator (VSO) deployed via Helm with the CSI provider driver enabled.
-- `CSISecrets` custom resource that maps a Vault KV v2 path to a CSI volume.
-- Secrets delivered directly into pods as ephemeral file-system volume mounts — no Kubernetes
-  `Secret` objects created, no environment variable exposure.
-- Nginx ingress controller backed by an internet-facing AWS Network Load Balancer with pre-allocated
-  Elastic IPs.
-- Go web application (`demo-go-web`) that renders Vault secret content to illustrate live delivery.
-- Secret rotation support: update the Vault secret and restart pods to pick up the new value.
-
 ## Demo Components
 
-- **AWS networking:** VPC, private and public subnets, Internet Gateway, NAT Gateway.
-- **Compute:** EKS cluster with a managed node group (t3.medium, 1–3 nodes).
-- **Ingress:** nginx ingress controller, AWS NLB, 3 pre-allocated Elastic IPs.
-- **Vault:** Namespace, KV v2 mount (`webapp`), static secret (`webapp/app/config`), Kubernetes
-  auth backend, role, and policy.
-- **VSO:** Helm release v1.3.0 with the CSI driver side-car enabled (`csi.enabled: true`).
-- **Kubernetes workload:** `CSISecrets` CR, deployment (3 replicas), ClusterIP service, ingress rule.
-- **RBAC:** `vault-auth` service account, long-lived token secret, `system:auth-delegator` cluster
-  role binding.
+- **AWS Networking:** VPC with private/public subnets across multiple Availability Zones, Internet Gateway, and NAT-based outbound connectivity for EKS worker nodes.
+- **Compute:** EKS cluster (v1.34) with a managed node group (t3.medium, 1–3 nodes) and core addons (CoreDNS, kube-proxy, VPC CNI, EKS Pod Identity Agent).
+- **Ingress:** Nginx ingress controller backed by an internet-facing AWS Network Load Balancer (NLB) with 3 pre-allocated Elastic IPs.
+- **Vault:** Isolated namespace, KV v2 mount (`webapp`), and static secret (`webapp/app/config`). Contains the Kubernetes auth backend wired to the EKS cluster using service account token review, plus required roles and policies.
+- **Vault Secrets Operator (VSO):** Helm release v1.3.0 deployed with the CSI provider driver side-car enabled (`csi.enabled: true`).
+- **Kubernetes Workload & RBAC:** Includes the Go web application deployment (`demo-webapp`, 3 replicas), ClusterIP service, and ingress rule. Configures a `vault-auth` service account, long-lived token secret, and `system:auth-delegator` cluster role binding.
+- **CSISecrets Custom Resource:** Maps the Vault KV v2 path to a CSI volume, delivering secrets directly into pods as ephemeral file-system volume mounts at `/var/run/secrets/vault` — no Kubernetes `Secret` objects are created, preventing environment variable exposure. Supports deliberate secret rotation by picking up new values on pod restart.
 
 ## Secret Delivery Mechanism
 

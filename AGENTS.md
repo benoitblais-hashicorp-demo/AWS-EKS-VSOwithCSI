@@ -75,7 +75,7 @@ When editing or creating `docs/README_header.md`, ensure it contains:
 - A description of the general purpose of the code.
 - A `Permissions` section containing the permissions required to provision resources for each provider.
 - An `Authentications` section containing the authentication details required for each provider.
-- A `Features` section containing key features managed by the code.
+- A `Demo Components` section containing key features and components managed by the code.
 
 ## README_footer.md
 
