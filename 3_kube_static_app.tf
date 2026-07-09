@@ -204,7 +204,7 @@ resource "kubernetes_role_binding_v1" "restarter" {
   subject {
     kind      = "ServiceAccount"
     name      = kubernetes_service_account_v1.restarter[0].metadata.0.name
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
 }
 
@@ -213,7 +213,7 @@ resource "kubernetes_cron_job_v1" "restarter" {
   depends_on = [time_sleep.step_3]
   metadata {
     name      = "static-secrets-restarter"
-    namespace = kubernetes_namespace_v1.simple_app[0].metadata.0.name
+    namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
   spec {
     schedule = "* * * * *"
