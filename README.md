@@ -409,6 +409,14 @@ Type: `string`
 
 Default: `"t3.medium"`
 
+### <a name="input_owner"></a> [owner](#input\_owner)
+
+Description: (Optional) Owner identifier (e.g., email) used for tagging.
+
+Type: `string`
+
+Default: `"user@example.com"`
+
 ### <a name="input_public_hosted_zone"></a> [public\_hosted\_zone](#input\_public\_hosted\_zone)
 
 Description: (Optional) The Route 53 public hosted zone name (e.g., 'example.com') where DNS validation and A records will be published. If set, an ACM certificate will be provisioned directly on the NGINX Network Load Balancer.
@@ -424,6 +432,14 @@ Description: (Optional) AWS region where all resources are provisioned.
 Type: `string`
 
 Default: `"ca-central-1"`
+
+### <a name="input_repository"></a> [repository](#input\_repository)
+
+Description: (Optional) The URL of the repository where the codebase resides.
+
+Type: `string`
+
+Default: `"github.com/hashicorp/terraform-demo"`
 
 ### <a name="input_resources_prefix"></a> [resources\_prefix](#input\_resources\_prefix)
 
