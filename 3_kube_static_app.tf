@@ -1,5 +1,21 @@
 # Copyright IBM Corp. 2024, 2026
 
+# ==============================================================================
+# DEMO WEB APPLICATION & SECRETS INJECTION
+# ==============================================================================
+# This file provisions the core Go web application and configures the Vault 
+# Secrets Operator CSI provider to inject Vault secrets directly into the 
+# application pods as ephemeral volume mounts. It also sets up a CronJob to 
+# periodically restart the deployment, demonstrating dynamic secret retrieval 
+# without storing sensitive data in native Kubernetes Secrets.
+# This execution is gated by the step_3 variable.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# VAULT SECRETS OPERATOR (CSI INTEGRATION)
+# ------------------------------------------------------------------------------
+
+# 1. Provide VSO with instructions on which internal Vault path to sync via CSI
 resource "kubernetes_manifest" "vault_csi_secret" {
   count = var.step_3 ? 1 : 0
   depends_on = [
@@ -38,7 +54,12 @@ EOF
   )
 }
 
-resource "kubernetes_deployment_v1" "static_app" {
+# ------------------------------------------------------------------------------
+# APPLICATION DEPLOYMENT & SERVICE
+# ------------------------------------------------------------------------------
+
+# 2. Deploy the web application pods and mount the dynamic CSI volume containing the secrets
+resource "kubernetes_deployment_v1" "demo_webapp" {
   count            = var.step_3 ? 1 : 0
   wait_for_rollout = false
   depends_on = [
@@ -46,7 +67,7 @@ resource "kubernetes_deployment_v1" "static_app" {
     kubernetes_manifest.vault_csi_secret,
   ]
   metadata {
-    name      = "static-secrets"
+    name      = "demo-webapp"
     namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
 
@@ -61,14 +82,14 @@ resource "kubernetes_deployment_v1" "static_app" {
 
     selector {
       match_labels = {
-        app = "static-secrets"
+        app = "demo-webapp"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "static-secrets"
+          app = "demo-webapp"
         }
         annotations = {
           "kubectl.kubernetes.io/restartedAt" = var.static_app_rollout_token != "" ? var.static_app_rollout_token : "initial-deploy"
@@ -78,7 +99,7 @@ resource "kubernetes_deployment_v1" "static_app" {
       spec {
         service_account_name = kubernetes_service_account_v1.vault[0].metadata.0.name
         container {
-          name              = "static-secrets"
+          name              = "demo-webapp"
           image             = var.demo_webapp_image
           image_pull_policy = "Always"
           port {
@@ -143,11 +164,12 @@ resource "kubernetes_deployment_v1" "static_app" {
   }
 }
 
-resource "kubernetes_service_v1" "static_app" {
+# 3. Expose the web application internally within the Kubernetes cluster
+resource "kubernetes_service_v1" "demo_webapp" {
   count      = var.step_3 ? 1 : 0
   depends_on = [time_sleep.step_3]
   metadata {
-    name      = kubernetes_deployment_v1.static_app[0].metadata.0.name
+    name      = kubernetes_deployment_v1.demo_webapp[0].metadata.0.name
     namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
 
@@ -160,11 +182,16 @@ resource "kubernetes_service_v1" "static_app" {
     }
 
     selector = {
-      app = "static-secrets"
+      app = "demo-webapp"
     }
   }
 }
 
+# ------------------------------------------------------------------------------
+# AUTOMATED POD RESTARTER (CRONJOB)
+# ------------------------------------------------------------------------------
+
+# 4. Create a dedicated Service Account for the cronjob pod restarter
 resource "kubernetes_service_account_v1" "restarter" {
   count      = var.step_3 ? 1 : 0
   depends_on = [time_sleep.step_3]
@@ -174,6 +201,7 @@ resource "kubernetes_service_account_v1" "restarter" {
   }
 }
 
+# 5. Grant permissions to execute a "deployment rollout restart"
 resource "kubernetes_role_v1" "restarter" {
   count      = var.step_3 ? 1 : 0
   depends_on = [time_sleep.step_3]
@@ -188,6 +216,7 @@ resource "kubernetes_role_v1" "restarter" {
   }
 }
 
+# 6. Bind the rollout restart permissions to the cronjob's Service Account
 resource "kubernetes_role_binding_v1" "restarter" {
   count      = var.step_3 ? 1 : 0
   depends_on = [time_sleep.step_3]
@@ -207,11 +236,12 @@ resource "kubernetes_role_binding_v1" "restarter" {
   }
 }
 
+# 7. Configure a CronJob that triggers `kubectl rollout restart deployment/demo-webapp` every minute
 resource "kubernetes_cron_job_v1" "restarter" {
   count      = var.step_3 ? 1 : 0
   depends_on = [time_sleep.step_3]
   metadata {
-    name      = "static-secrets-restarter"
+    name      = "demo-webapp-restarter"
     namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
   spec {
@@ -226,7 +256,7 @@ resource "kubernetes_cron_job_v1" "restarter" {
             container {
               name    = "kubectl"
               image   = "bitnami/kubectl:latest"
-              command = ["kubectl", "rollout", "restart", "deployment/static-secrets"]
+              command = ["kubectl", "rollout", "restart", "deployment/demo-webapp"]
             }
             restart_policy = "OnFailure"
           }
