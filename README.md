@@ -228,6 +228,7 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 To provision the AWS resources managed by this code, the IAM role or user running Terraform
 needs the following permissions:
 
+- `acm:RequestCertificate` / `acm:DeleteCertificate` / `acm:DescribeCertificate` / `acm:AddTagsToCertificate`
 - `ec2:DescribeAvailabilityZones`
 - `ec2:DescribeImages`
 - `ec2:DescribeVpcs`
@@ -258,6 +259,7 @@ needs the following permissions:
 - `kms:CreateKey` / `kms:DescribeKey` / `kms:CreateAlias` / `kms:DeleteAlias`
 - `kms:EnableKeyRotation` / `kms:GetKeyPolicy` / `kms:PutKeyPolicy`
 - `kms:ScheduleKeyDeletion`
+- `route53:ChangeResourceRecordSets` / `route53:GetChange` / `route53:ListHostedZones` / `route53:GetHostedZone`
 
 ### Vault Permissions
 
