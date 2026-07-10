@@ -317,6 +317,10 @@ Use environment variables to authenticate with a static Vault token:
 - `VAULT_TOKEN`: Set to a valid Vault token with the permissions listed above.
 - `VAULT_NAMESPACE`: Set to the parent namespace (e.g., `admin`) if applicable.
 
+Documentation:
+
+- https://registry.terraform.io/providers/hashicorp/vault/latest/docs
+
 #### HCP Terraform Dynamic Credentials (Recommended)
 
 For enhanced security, use HCP Terraform's dynamic provider credentials to authenticate to Vault without storing static tokens.
@@ -327,18 +331,10 @@ This method uses workload identity (JWT/OIDC) to generate short-lived Vault toke
 - `TFC_VAULT_NAMESPACE`: Set to the parent namespace.
 - `TFC_VAULT_RUN_ROLE`: Set to the JWT role name configured in Vault.
 
-### HCP Terraform Authentication
+Documentation:
 
-The workspace is driven by a VCS connection. No manual `terraform init` or `terraform apply`
-is required. Workspace variables are used for all provider credentials.
-
-## Setup & Deployment
-
-1. Set up an HCP Terraform Workspace connected to your VCS repository.
-2. Configure the required workspace variables and HCP Terraform dynamic credentials (for AWS and Vault).
-3. **Step 1:** Queue a run with `step_2 = false` and `step_3 = false`. This provisions the foundational AWS infrastructure and the Vault namespace.
-4. **Step 2:** Update your workspace variables to set `step_2 = true`. To prevent parallel dependency failures, apply this step on its own to deploy the Kubernetes tooling (Nginx ingress, Uptycs EDR, VSO Helm Chart, Vault Auth).
-5. **Step 3:** Finally, set `step_3 = true` and queue the final run. This deploys the CSISecrets resource and the target application pods.
+- [HCP Terraform Dynamic Credentials](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/dynamic-provider-credentials)
+- [Vault JWT Auth Method](https://developer.hashicorp.com/vault/docs/auth/jwt)
 
 ## Troubleshooting & Known Issues
 
