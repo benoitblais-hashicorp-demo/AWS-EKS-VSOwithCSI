@@ -163,21 +163,26 @@ After variables are configured, trigger runs from the workspace (VCS-driven) or 
 
 ### Walkthrough: Explaining the Configuration
 
-Once the application is running, it is helpful to explain how the configuration pieces fit together to enable the CSI integration:
+Once the application is running, here is how you can explain the integration flow to your audience:
 
 1. **Vault Policy (`2_vault_policy.tf`)**:
-   Show the `apps-policy` in Vault. Explain that this policy grants read-only access strictly to the `webapp/*` path where the application's secret resides.
+   - **Where:** Vault UI → Policies → `apps-policy`.
+   - **What to say:** Explain that this policy grants read-only access strictly to the `webapp/*` path where the application's secret resides.
 2. **Kubernetes Auth Method (`2_vault_kube.tf`)**:
-   Explain how Vault is configured to trust the EKS cluster. Show the `demo-go-web-vso-csi` role in Vault, which ties the `apps-policy` to the specific Kubernetes service account (`vault-auth`) and namespace (`demo-go-web-vso-csi`), enforcing strict identity mapping.
+   - **Where:** Vault UI → Access → `kubernetes` → Roles → `demo-go-web-vso-csi`.
+   - **What to say:** Explain how Vault is configured to trust the EKS cluster. Show the role that ties the `apps-policy` to the specific Kubernetes service account (`vault-auth`) and namespace (`demo-go-web-vso-csi`), enforcing strict identity mapping.
 3. **Vault Secrets Operator Helm Chart (`2_kube_vso.tf`)**:
-   Highlight the `values.yaml` configuration where the CSI driver is enabled (`csi.enabled: true`) and default Vault connection methods are disabled to enforce explicit authorization via Custom Resources.
+   - **Where:** Terraform codebase (`2_kube_vso.tf`).
+   - **What to say:** Highlight the `values.yaml` configuration mapping where the CSI driver is enabled natively (`csi.enabled: true`).
 4. **CSISecrets Custom Resource (`3_kube_static_app.tf`)**:
-   Show the developer-facing Kubernetes manifest. Explain how it connects the application to Vault:
-   - Points to the Vault connection and auth method (`vaultAuthRef`).
-   - Specifies the exact secret path to fetch (`vaultStaticSecrets`).
-   - Restricts which pods can mount this secret (`accessControl` with `serviceAccountPattern` and `namespacePatterns`).
+   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Custom Resources → `CSISecrets`.
+   - **What to say:** Show the developer-facing Kubernetes manifest defining exactly which secret path to fetch, and which Kubernetes service account is authorized to consume it.
 5. **Pod Volume Mount (`3_kube_static_app.tf`)**:
-   Show the deployment specification. The pod utilizes the `csi.vso.hashicorp.com` storage driver for its volume and passes the `csiSecretsName` attribute. This is how Kubernetes natively mounts the ephemeral secret file into the pod without ever creating a traditional Kubernetes `Secret` object.
+   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML view.
+   - **What to say:** Show the pod specification. Highlight how the pod utilizes the `csi.vso.hashicorp.com` storage driver via a `VolumeMount`, bypassing standard injected Kubernetes Secrets.
+6. **No Kubernetes Secrets Generated**:
+   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Configuration → Secrets.
+   - **What to say:** Filter by the `demo-go-web-vso-csi` namespace. Prove to the audience that there are **no application secret objects** stored here. The only secrets present are standard Kubernetes service account tokens. The actual application secret remains entirely ephemeral.
 
 ### Secret Rotation Demo
 
@@ -214,15 +219,6 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 - No Kubernetes `Secret` objects are modified — the rotation is purely between Vault and the pod.
 - Vault KV v2 retains the prior version; rolling back is as simple as re-pinning the secret
   version in the `CSISecrets` resource and restarting pods.
-
-## Expected Behavior
-
-- Step 1 provisions the EKS cluster, VPC, and the initial Vault secret.
-- Step 2 deploys VSO and registers the CSI driver on all EKS worker nodes.
-- Step 3 deploys the web application; the demo page loads and displays the Vault secret content.
-- No `Secret` object of type `Opaque` (or any other type) is created to hold the application secret.
-- Updating the Vault secret does not immediately affect running pods; a pod restart is required.
-- The `website` output is only populated once both `step_2` and `step_3` are `true`.
 
 ## Permissions
 
