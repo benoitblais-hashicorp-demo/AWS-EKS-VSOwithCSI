@@ -605,14 +605,4 @@ Description: Vault namespace scoped to this demo deployment
 Description: Public URL of the VSO + CSI demo web application (available after step\_3 = true)
 
 <!-- markdownlint-enable -->
-## External Documentation
-
-* [AWS Terraform Provider Documentation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
-* [Vault Terraform Provider Documentation](https://registry.terraform.io/providers/hashicorp/vault/latest/docs)
-* [Helm Terraform Provider Documentation](https://registry.terraform.io/providers/hashicorp/helm/latest/docs)
-* [Kubernetes Terraform Provider Documentation](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
-* [Vault Secrets Operator (VSO) Documentation](https://developer.hashicorp.com/vault/docs/platform/k8s/vso)
-* [VSO CSI Provider Reference](https://developer.hashicorp.com/vault/docs/platform/k8s/vso/csi)
-* [HCP Terraform Dynamic Credentials](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/dynamic-provider-credentials)
-* [Vault JWT Auth Method](https://developer.hashicorp.com/vault/docs/auth/jwt)
 <!-- END_TF_DOCS -->
