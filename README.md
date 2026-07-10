@@ -271,21 +271,42 @@ The Vault token or dynamic credential used by Terraform must have the following 
 - Enable and configure the Kubernetes auth backend (`sys/auth/*`, `auth/kubernetes/*`).
 - Create and manage Vault policies (`sys/policies/acl/*`).
 
-### HCP Terraform Permissions
-
-To manage workspace variables and trigger runs, provide a user or team token with **Manage
-workspaces** and **Read variables** permissions for the target workspace.
-
 ## Authentications
 
 ### AWS Authentication
 
-AWS authentication uses HCP Terraform Dynamic Provider Credentials (OIDC role assumption).
+#### HCP Terraform / Terraform Enterprise Dynamic Credentials (OIDC)
 
-- Configure the HCP Terraform workspace to assume an AWS IAM role via OIDC.
-- Do not use long-lived static AWS credentials for normal runs.
-- The `shared_config_file` variable in `variables_providers.tf` is pre-wired and can be
-  uncommented in `providers.tf` once dynamic credentials are available in the workspace.
+Use dynamic provider credentials via OpenID Connect (OIDC) for secure, short-lived credentials when running in HCP Terraform or Terraform Enterprise.
+
+- **Using environment variables (HCP Terraform Workspace)**
+  - `TFC_AWS_PROVIDER_AUTH=true`
+  - `TFC_AWS_RUN_ROLE_ARN=<your_aws_iam_role_arn>`
+
+Documentation:
+
+- [Dynamic Provider Credentials in HCP Terraform](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/dynamic-provider-credentials/aws-configuration)
+
+#### [Environment Variables](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#environment-variables)
+
+Credentials can be provided by using the `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and optionally `AWS_SESSION_TOKEN` environment variables. The Region can be set using the `AWS_REGION` or `AWS_DEFAULT_REGION` environment variables.
+
+For example:
+
+```hcl
+provider "aws" {}
+```
+
+```bash
+$ export AWS_ACCESS_KEY_ID="anaccesskey"
+$ export AWS_SECRET_ACCESS_KEY="asecretkey"
+$ export AWS_REGION="us-west-2"
+$ terraform plan
+```
+
+Documentation:
+
+- [AWS Provider Authentication](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication)
 
 ### Vault Authentication
 
