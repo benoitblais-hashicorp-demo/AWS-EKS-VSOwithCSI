@@ -176,8 +176,8 @@ Once the application is running, here is how you can explain the integration flo
    - **Where:** Terraform codebase (`2_kube_vso.tf`).
    - **What to say:** Highlight the `values.yaml` configuration mapping where the CSI driver is enabled natively (`csi.enabled: true`).
 4. **CSISecrets Custom Resource (`3_kube_static_app.tf`)**:
-   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Extensions → CustomResourceDefinitions → `csisecrets.secrets.hashicorp.com`.
-   - **What to say:** Show the developer-facing Kubernetes manifest defining exactly which secret path to fetch, and which Kubernetes service account is authorized to consume it.
+   - **Where:** Your IDE / VS Code (open `3_kube_static_app.tf`).
+   - **What to say:** Since the AWS EKS Console doesn't natively display Custom Resource instances, show the `kubernetes_manifest.vault_csi_secret` block directly in your editor. Point out the `mount: webapp` and `path: app/config` mappings. Explain to the audience that this is the developer-facing manifest: they simply define this custom resource to tell the CSI driver exactly which Vault secret to fetch, without needing to know any Vault API logic.
 5. **Pod Volume Mount (`3_kube_static_app.tf`)**:
    - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML view.
    - **What to say:** Show the pod specification. Highlight how the pod utilizes the `csi.vso.hashicorp.com` storage driver via a `VolumeMount`, bypassing standard injected Kubernetes Secrets.
