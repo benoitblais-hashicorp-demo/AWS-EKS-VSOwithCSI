@@ -236,7 +236,7 @@ resource "kubernetes_role_binding_v1" "restarter" {
   }
 }
 
-# 7. Configure a CronJob that triggers `kubectl rollout restart deployment/demo-webapp` every minute
+# 7. Configure a CronJob that triggers `kubectl rollout restart deployment/demo-webapp` every 3 minutes
 resource "kubernetes_cron_job_v1" "restarter" {
   count      = var.step_3 ? 1 : 0
   depends_on = [time_sleep.step_3]
@@ -245,7 +245,7 @@ resource "kubernetes_cron_job_v1" "restarter" {
     namespace = kubernetes_namespace_v1.demo_app[0].metadata.0.name
   }
   spec {
-    schedule = "* * * * *"
+    schedule = "*/3 * * * *"
     job_template {
       metadata {}
       spec {

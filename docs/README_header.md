@@ -201,8 +201,8 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 
 #### Automated Pod Rotation
 
-1. To remove the need for manual console access, this demo provisions a Kubernetes `CronJob` that executes a `kubectl rollout restart deployment/demo-webapp` every minute.
-2. Wait for up to 60 seconds to allow the CronJob to trigger.
+1. To remove the need for manual console access, this demo provisions a Kubernetes `CronJob` that executes a `kubectl rollout restart deployment/demo-webapp` every 3 minutes.
+2. Wait for up to 3 minutes to allow the CronJob to trigger.
 3. As the deployment rolls over and replacement pods start, the VSO CSI driver re-authenticates to Vault, reads
    the current secret version, and injects the new data into the pod's ephemeral volume.
 4. Reload the demo web application — the **new message from Vault is now displayed**.
