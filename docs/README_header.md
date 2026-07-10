@@ -181,7 +181,7 @@ Once the application is running, here is how you can explain the integration flo
    - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML / Raw view.
    - **What to say:** Scroll down to the `spec.containers.volumeMounts` block to highlight where the application mounts the ephemeral directory (`/var/run/secrets/vault`). Then, scroll down to the `spec.volumes` block to show how that specific volume is backed directly by the `csi.vso.hashicorp.com` driver rather than a standard Kubernetes Secret.
 6. **No Kubernetes Secrets Generated**:
-   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Configuration → Secrets.
+   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Config and secrets.
    - **What to say:** Filter by the `demo-go-web-vso-csi` namespace. Prove to the audience that there are **no application secret objects** stored here. The only secrets present are standard Kubernetes service account tokens. The actual application secret remains entirely ephemeral.
 
 ### Secret Rotation Demo
