@@ -175,13 +175,22 @@ Once the application is running, here is how you can explain the integration flo
    - **Where:** Terraform codebase (`2_kube_vso.tf`).
    - **What to say:** Highlight the `values.yaml` configuration mapping where the CSI driver is enabled natively (`csi.enabled: true`).
 4. **CSISecrets Custom Resource (`3_kube_static_app.tf`)**:
-   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Custom Resources → `CSISecrets`.
-   - **What to say:** Show the developer-facing Kubernetes manifest defining exactly which secret path to fetch, and which Kubernetes service account is authorized to consume it.
+   - **Where:** Terraform codebase (`3_kube_static_app.tf`).
+   - **What to say:** Since the AWS EKS Console doesn't natively display Custom
+     Resource instances, show the `kubernetes_manifest.vault_csi_secret` block directly
+     in your editor. Point out the `mount: webapp` and `path: app/config` mappings.
+     Explain to the audience that this is the developer-facing manifest: they simply
+     define this custom resource to tell the CSI driver exactly which Vault secret
+     to fetch, without needing to know any Vault API logic.
 5. **Pod Volume Mount (`3_kube_static_app.tf`)**:
-   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML view.
-   - **What to say:** Show the pod specification. Highlight how the pod utilizes the `csi.vso.hashicorp.com` storage driver via a `VolumeMount`, bypassing standard injected Kubernetes Secrets.
+   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML / Raw view.
+   - **What to say:** Scroll down to the `spec.containers.volumeMounts` block to
+     highlight where the application mounts the ephemeral directory (`/var/run/secrets/vault`).
+     Then, scroll down to the `spec.volumes` block to show how that specific volume
+     is backed directly by the `csi.vso.hashicorp.com` driver rather than a standard
+     Kubernetes Secret.
 6. **No Kubernetes Secrets Generated**:
-   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Configuration → Secrets.
+   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Config and secrets.
    - **What to say:** Filter by the `demo-go-web-vso-csi` namespace. Prove to the audience that there are **no application secret objects** stored here. The only secrets present are standard Kubernetes service account tokens. The actual application secret remains entirely ephemeral.
 
 ### Secret Rotation Demo
@@ -338,5 +347,13 @@ Documentation:
 
 ## Troubleshooting & Known Issues
 
-- **Vault Enterprise Validation Errors:** The VSO CSI driver requires Vault Enterprise to function and hard-validates this requirement by querying the `/sys/license/status` endpoint. If your pod's Vault policy does not grant `read` capability to this endpoint, the volume mount will throw a `vault enterprise client validation failed` error, completely blocking Pod scheduling.
-- **Vault 403 Permission Denied during Token Review:** When mapping the Vault Kubernetes Auth backend inside an HCP Vault dedicated namespace, ensure that the `VaultAuth` custom resource refers to the Vault namespace using the **Namespace ID** instead of the FQDN path. Using the full namespace path generates a 403 error due to token evaluation logic.
+- **Vault Enterprise Validation Errors:** The VSO CSI driver requires Vault Enterprise to function and hard-validates this
+  requirement by querying the `/sys/license/status` endpoint. If your pod's Vault policy does not grant `read` capability
+  to this endpoint, the volume mount will throw a `vault enterprise client validation failed` error, completely blocking Pod scheduling.
+- **Invalid Audience / Issuer Claims:** When mapping the Vault Kubernetes Auth backend against an EKS cluster, avoid hardcoding
+  the `audience = "vault"` constraint on the role and set `disable_iss_validation = true` on the backend config. Short-lived
+  CSI volume tokens generated natively by EKS often omit specific audiences and rotate dynamic OIDC issuers, causing 403 Forbidden
+  errors if strict matching is enforced.
+- **Vault 403 Permission Denied during Token Review:** When mapping the Vault Kubernetes Auth backend inside an HCP Vault
+  dedicated namespace, ensure that the `VaultAuth` custom resource refers to the Vault namespace using the **Namespace ID**
+  instead of the FQDN path. Using the full namespace path generates a 403 error due to token evaluation logic.
