@@ -37,8 +37,6 @@ resource "helm_release" "vault_secrets_operator" {
     kubernetes:
       role: "${vault_kubernetes_auth_backend_role.demo_app_role[0].role_name}"
       serviceAccount: "${kubernetes_service_account_v1.vault[0].metadata.0.name}"
-      audiences:
-        - "vault"
   csi:
     enabled: true
 EOT

@@ -24,13 +24,14 @@ resource "vault_auth_backend" "kube_auth" {
 
 # 2. Configure Vault to trust the EKS cluster using its endpoints and the TokenReview service account secret
 resource "vault_kubernetes_auth_backend_config" "kube_auth_cfg" {
-  count              = var.step_2 ? 1 : 0
-  depends_on         = [time_sleep.step_2]
-  namespace          = vault_namespace.namespace.path
-  backend            = vault_auth_backend.kube_auth[0].path
-  kubernetes_ca_cert = base64decode(module.eks.cluster_certificate_authority_data)
-  kubernetes_host    = module.eks.cluster_endpoint
-  token_reviewer_jwt = kubernetes_secret_v1.vault_token[0].data["token"]
+  count                  = var.step_2 ? 1 : 0
+  depends_on             = [time_sleep.step_2]
+  namespace              = vault_namespace.namespace.path
+  backend                = vault_auth_backend.kube_auth[0].path
+  kubernetes_ca_cert     = base64decode(module.eks.cluster_certificate_authority_data)
+  kubernetes_host        = module.eks.cluster_endpoint
+  token_reviewer_jwt     = kubernetes_secret_v1.vault_token[0].data["token"]
+  disable_iss_validation = true
 }
 
 # ------------------------------------------------------------------------------
@@ -48,5 +49,4 @@ resource "vault_kubernetes_auth_backend_role" "demo_app_role" {
   bound_service_account_namespaces = [kubernetes_namespace_v1.demo_app[0].metadata.0.name]
   token_max_ttl                    = 86400
   token_policies                   = [vault_policy.apps_policy[0].name]
-  audience                         = "vault"
 }
