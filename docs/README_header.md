@@ -194,18 +194,16 @@ This section walks through the deliberate secret rotation pattern that VSO + CSI
 
 #### Observe the behavior
 
-1. Reload the demo web application — the **original message is still displayed**. This is expected:
+1. Quickly reload the demo web application — the **original message is likely still displayed**. This is expected:
    the CSI volume is bound to the pod at startup and is not live-reloaded while the pod is running.
    Vault still holds the updated secret, but the running pod retains the prior version in its
    ephemeral volume.
 
-#### Apply the rotation to running pods
+#### Automated Pod Rotation
 
-1. In the **AWS Console → EKS → Clusters → <resources_prefix>-<random_id>-eks**, go to the
-   **Resources** tab → **Workloads → Pods**, filter by namespace `demo-go-web-vso-csi`.
-2. Select all `demo-webapp-*` pods and delete them (one at a time or all at once).
-   The deployment controller will immediately schedule replacement pods.
-3. As each replacement pod starts, the VSO CSI driver re-authenticates to Vault, reads
+1. To remove the need for manual console access, this demo provisions a Kubernetes `CronJob` that executes a `kubectl rollout restart deployment/demo-webapp` every minute.
+2. Wait for up to 60 seconds to allow the CronJob to trigger.
+3. As the deployment rolls over and replacement pods start, the VSO CSI driver re-authenticates to Vault, reads
    the current secret version, and injects the new data into the pod's ephemeral volume.
 4. Reload the demo web application — the **new message from Vault is now displayed**.
 
