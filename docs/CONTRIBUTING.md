@@ -34,3 +34,7 @@ This project leverages standard Terraform configurations and uses HCP Terraform 
 * Access secrets securely via workspace variables. Set `sensitive = true` for sensitive variables across all definitions.
 
 If you find a security vulnerability, please refer to our `SECURITY.md` for reporting procedures.
+
+## Documentation
+
+* **Auto-generated README:** Do not edit `README.md` directly. It is generated automatically by `terraform-docs` via GitHub Actions CI. To modify the README content, edit `docs/README_header.md` or `docs/README_footer.md` instead.

@@ -47,6 +47,12 @@ variable "doormat_username" {
   }
 }
 
+variable "environment" {
+  description = "(Optional) Corresponds to the environment tag in AWS."
+  type        = string
+  default     = "dev"
+}
+
 variable "instance_type" {
   description = "(Optional) EC2 instance type for the EKS managed node group."
   type        = string
@@ -66,6 +72,12 @@ variable "instance_type" {
   }
 }
 
+variable "owner" {
+  description = "(Optional) Owner identifier (e.g., email) used for tagging."
+  type        = string
+  default     = "user@example.com"
+}
+
 variable "public_hosted_zone" {
   description = "(Optional) The Route 53 public hosted zone name (e.g., 'example.com') where DNS validation and A records will be published. If set, an ACM certificate will be provisioned directly on the NGINX Network Load Balancer."
   type        = string
@@ -81,6 +93,24 @@ variable "region" {
     condition     = can(regex("^[a-z]{2}-[a-z]+-[0-9]+$", var.region))
     error_message = "`region` must be a valid AWS region identifier (e.g. ca-central-1, eu-central-1)."
   }
+}
+
+variable "repository" {
+  description = "(Optional) The URL of the repository where the codebase resides."
+  type        = string
+  default     = "github.com/hashicorp/terraform-demo"
+}
+
+variable "resources_prefix" {
+  description = "(Optional) Prefix applied to all resources."
+  type        = string
+  default     = "vso-csi"
+}
+
+variable "salesforce_opportunity_id" {
+  description = "(Optional) Corresponds to the salesforce_id tag in AWS."
+  type        = string
+  default     = "N/A"
 }
 
 variable "static_app_rollout_token" {
@@ -101,28 +131,11 @@ variable "step_3" {
   default     = false
 }
 
-variable "uptycs_tags" {
-  description = "(Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER format."
+# tflint-ignore: terraform_naming_convention
+variable "TFC_PROJECT_NAME" {
+  description = "(Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-project tag in AWS."
   type        = string
-  default     = "UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
-}
-
-variable "environment" {
-  description = "(Optional) Corresponds to the environment tag in AWS."
-  type        = string
-  default     = "dev"
-}
-
-variable "resources_prefix" {
-  description = "(Optional) Prefix applied to all resources."
-  type        = string
-  default     = "vso-csi"
-}
-
-variable "salesforce_opportunity_id" {
-  description = "(Optional) Corresponds to the salesforce_id tag in AWS."
-  type        = string
-  default     = "N/A"
+  default     = "local-project"
 }
 
 # tflint-ignore: terraform_naming_convention
@@ -132,11 +145,10 @@ variable "TFC_WORKSPACE_NAME" {
   default     = "local-workspace"
 }
 
-# tflint-ignore: terraform_naming_convention
-variable "TFC_PROJECT_NAME" {
-  description = "(Optional) Automatically populated by Terraform Cloud. Corresponds to the cdl-ddr-project tag in AWS."
+variable "uptycs_tags" {
+  description = "(Optional) Comma-separated Uptycs tags in UPDATE/CCODE/UT/OWNER format."
   type        = string
-  default     = "local-project"
+  default     = "UPDATE/PROD,CCODE/HashiCorp,UT/20A7V,OWNER/owner-email@hashicorp.com"
 }
 
 variable "vpc_cidr" {

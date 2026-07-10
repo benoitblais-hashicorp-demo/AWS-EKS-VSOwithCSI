@@ -1,10 +1,24 @@
 # Copyright IBM Corp. 2024, 2026
 
+# ==============================================================================
+# APPLICATION INGRESS ARCHITECTURE
+# ==============================================================================
+# This file provisions the Kubernetes Ingress resource for the demo application.
+# It configures the routing rules for the NGINX Ingress Controller to direct
+# external web traffic into the newly provisioned web application pods.
+# This execution is gated by the step_3 variable.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# KUBERNETES INGRESS ROUTING
+# ------------------------------------------------------------------------------
+
+# 1. Create an Ingress resource to route external traffic to the application service
 resource "kubernetes_ingress_v1" "apps" {
   count = var.step_3 ? 1 : 0
   depends_on = [
     time_sleep.step_3,
-    kubernetes_service_v1.static_app,
+    kubernetes_service_v1.demo_webapp,
   ]
   metadata {
     name      = "demo-go-web-vso-csi"
@@ -28,7 +42,7 @@ resource "kubernetes_ingress_v1" "apps" {
           path_type = "Prefix"
           backend {
             service {
-              name = kubernetes_service_v1.static_app[0].metadata.0.name
+              name = kubernetes_service_v1.demo_webapp[0].metadata.0.name
               port {
                 number = 8080
               }

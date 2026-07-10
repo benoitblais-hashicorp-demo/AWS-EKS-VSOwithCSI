@@ -25,7 +25,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 ├── providers.tf          # Provider configurations
 ├── variables.tf          # Input variable definitions (alphabetical order)
 ├── variables_providers.tf # Dynamic credential variables (currently commented out)
-├── 1_locals.tf           # Local values and AZ discovery (Step 1)
+├── 1_locals.tf           # Randomized global identifiers and prefixes (Step 1)
 ├── 1_aws_network.tf      # VPC and subnet provisioning (Step 1)
 ├── 1_aws_eks.tf          # EKS cluster and node groups (Step 1)
 ├── 1_vault_ns.tf         # Vault namespace creation (Step 1)
@@ -39,7 +39,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 ├── 2_vault_policy.tf     # Vault policy for app access (Step 2)
 ├── 3_starting.tf         # Step 3 gate (time_sleep dependency guard)
 ├── 3_kube_ingress.tf     # Kubernetes ingress rule (Step 3)
-├── 3_kube_static_app.tf  # CSISecrets CRD, deployment, service, automation (Step 3)
+├── 3_kube_static_app.tf  # CSISecrets CRD, deployment (demo-webapp), service, automation (Step 3)
 ├── docs/
 │   ├── CODE_OF_CONDUCT.md
 │   ├── CONTRIBUTING.md
@@ -47,8 +47,7 @@ This project uses a numbered file naming convention to reflect the three deploym
 │   ├── README_footer.md
 │   ├── README_header.md
 │   ├── SECURITY.md
-│   ├── SPECIFICATION.md  # Technical architecture and design decisions
-│   └── WORKSPACE.md      # HCP Terraform workspace variable/auth configuration
+│   └── SPECIFICATION.md  # Technical architecture and design decisions
 ```
 
 ### Required Files and Directories
@@ -57,7 +56,6 @@ This project uses a numbered file naming convention to reflect the three deploym
 - `docs/README_header.md` – Describe the purpose of the demo, key features, permissions, and authentication.
 - `docs/README_footer.md` – External documentation links used to develop the code.
 - `docs/SPECIFICATION.md` – Technical architecture, design decisions, and demo flow documentation.
-- `docs/WORKSPACE.md` – Required workspace variables and authentication configuration for HCP Terraform.
 - `terraform.tf` – Terraform version and provider requirements (`required_version`, `required_providers`).
 - `providers.tf` – Provider configurations (AWS, Vault, Helm, Kubernetes).
 - `outputs.tf` – Output value definitions (alphabetical order).
@@ -77,7 +75,7 @@ When editing or creating `docs/README_header.md`, ensure it contains:
 - A description of the general purpose of the code.
 - A `Permissions` section containing the permissions required to provision resources for each provider.
 - An `Authentications` section containing the authentication details required for each provider.
-- A `Features` section containing key features managed by the code.
+- A `Demo Components` section containing key features and components managed by the code.
 
 ## README_footer.md
 
