@@ -176,7 +176,7 @@ Once the application is running, here is how you can explain the integration flo
    - **Where:** Terraform codebase (`2_kube_vso.tf`).
    - **What to say:** Highlight the `values.yaml` configuration mapping where the CSI driver is enabled natively (`csi.enabled: true`).
 4. **CSISecrets Custom Resource (`3_kube_static_app.tf`)**:
-   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Custom Resources → `CSISecrets`.
+   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Extensions → CustomResourceDefinitions → `csisecrets.secrets.hashicorp.com`.
    - **What to say:** Show the developer-facing Kubernetes manifest defining exactly which secret path to fetch, and which Kubernetes service account is authorized to consume it.
 5. **Pod Volume Mount (`3_kube_static_app.tf`)**:
    - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML view.
