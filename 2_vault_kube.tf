@@ -31,6 +31,7 @@ resource "vault_kubernetes_auth_backend_config" "kube_auth_cfg" {
   kubernetes_ca_cert = base64decode(module.eks.cluster_certificate_authority_data)
   kubernetes_host    = module.eks.cluster_endpoint
   token_reviewer_jwt = kubernetes_secret_v1.vault_token[0].data["token"]
+  disable_iss_validation = true
 }
 
 # ------------------------------------------------------------------------------
@@ -48,5 +49,4 @@ resource "vault_kubernetes_auth_backend_role" "demo_app_role" {
   bound_service_account_namespaces = [kubernetes_namespace_v1.demo_app[0].metadata.0.name]
   token_max_ttl                    = 86400
   token_policies                   = [vault_policy.apps_policy[0].name]
-  audience                         = "vault"
 }
