@@ -297,10 +297,10 @@ provider "aws" {}
 ```
 
 ```bash
-$ export AWS_ACCESS_KEY_ID="anaccesskey"
-$ export AWS_SECRET_ACCESS_KEY="asecretkey"
-$ export AWS_REGION="us-west-2"
-$ terraform plan
+export AWS_ACCESS_KEY_ID="anaccesskey"
+export AWS_SECRET_ACCESS_KEY="asecretkey"
+export AWS_REGION="us-west-2"
+terraform plan
 ```
 
 Documentation:
@@ -319,7 +319,7 @@ Use environment variables to authenticate with a static Vault token:
 
 Documentation:
 
-- https://registry.terraform.io/providers/hashicorp/vault/latest/docs
+- [Vault Provider Documentation](https://registry.terraform.io/providers/hashicorp/vault/latest/docs)
 
 #### HCP Terraform Dynamic Credentials (Recommended)
 
