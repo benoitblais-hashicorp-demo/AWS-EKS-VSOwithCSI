@@ -175,11 +175,11 @@ Once the application is running, here is how you can explain the integration flo
    - **Where:** Terraform codebase (`2_kube_vso.tf`).
    - **What to say:** Highlight the `values.yaml` configuration mapping where the CSI driver is enabled natively (`csi.enabled: true`).
 4. **CSISecrets Custom Resource (`3_kube_static_app.tf`)**:
-   - **Where:** Your IDE / VS Code (open `3_kube_static_app.tf`).
+   - **Where:** Terraform codebase (`3_kube_static_app.tf`).
    - **What to say:** Since the AWS EKS Console doesn't natively display Custom Resource instances, show the `kubernetes_manifest.vault_csi_secret` block directly in your editor. Point out the `mount: webapp` and `path: app/config` mappings. Explain to the audience that this is the developer-facing manifest: they simply define this custom resource to tell the CSI driver exactly which Vault secret to fetch, without needing to know any Vault API logic.
 5. **Pod Volume Mount (`3_kube_static_app.tf`)**:
-   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML view.
-   - **What to say:** Show the pod specification. Highlight how the pod utilizes the `csi.vso.hashicorp.com` storage driver via a `VolumeMount`, bypassing standard injected Kubernetes Secrets.
+   - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML / Raw view.
+   - **What to say:** Scroll down to the `spec.containers.volumeMounts` block to highlight where the application mounts the ephemeral directory (`/var/run/secrets/vault`). Then, scroll down to the `spec.volumes` block to show how that specific volume is backed directly by the `csi.vso.hashicorp.com` driver rather than a standard Kubernetes Secret.
 6. **No Kubernetes Secrets Generated**:
    - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Configuration → Secrets.
    - **What to say:** Filter by the `demo-go-web-vso-csi` namespace. Prove to the audience that there are **no application secret objects** stored here. The only secrets present are standard Kubernetes service account tokens. The actual application secret remains entirely ephemeral.
