@@ -310,26 +310,23 @@ Documentation:
 
 ### Vault Authentication
 
-Vault authentication uses HCP Terraform workload identity (JWT/OIDC) for the Vault provider.
-The workspace exchanges a short-lived identity token with Vault at run time and receives a
-scoped Vault token for the configured run role. This avoids long-lived `VAULT_TOKEN` secrets.
+#### Static Token
 
-```hcl
-provider "vault" {
-  # Authentication is injected by HCP Terraform when
-  # TFC_VAULT_PROVIDER_AUTH=true is configured in the workspace.
-}
-```
+Use environment variables to authenticate with a static Vault token:
 
-Recommended workspace environment variables for Vault JWT auth:
+- `VAULT_ADDR`: Set to your HCP Vault Dedicated cluster address (e.g., `https://my-cluster.vault.hashicorp.cloud:8200`).
+- `VAULT_TOKEN`: Set to a valid Vault token with the permissions listed above.
+- `VAULT_NAMESPACE`: Set to the parent namespace (e.g., `admin`) if applicable.
 
-- `TFC_VAULT_PROVIDER_AUTH=true`
-- `TFC_VAULT_ADDR=<vault_url>`
-- `TFC_VAULT_NAMESPACE=<namespace>` (for HCP Vault Dedicated / Vault Enterprise)
-- `TFC_VAULT_RUN_ROLE=<vault_role_name>`
-- `TFC_VAULT_AUTH_PATH=<auth_mount_path>` (optional; defaults to `jwt`)
+#### HCP Terraform Dynamic Credentials (Recommended)
 
-Do not set `VAULT_TOKEN` when using this model.
+For enhanced security, use HCP Terraform's dynamic provider credentials to authenticate to Vault without storing static tokens.
+This method uses workload identity (JWT/OIDC) to generate short-lived Vault tokens automatically.
+
+- `TFC_VAULT_PROVIDER_AUTH`: Set to `true`.
+- `TFC_VAULT_ADDR`: Set to your HCP Vault Dedicated cluster address.
+- `TFC_VAULT_NAMESPACE`: Set to the parent namespace.
+- `TFC_VAULT_RUN_ROLE`: Set to the JWT role name configured in Vault.
 
 ### HCP Terraform Authentication
 
@@ -620,4 +617,6 @@ Description: Public URL of the VSO + CSI demo web application (available after s
 * [Kubernetes Terraform Provider Documentation](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
 * [Vault Secrets Operator (VSO) Documentation](https://developer.hashicorp.com/vault/docs/platform/k8s/vso)
 * [VSO CSI Provider Reference](https://developer.hashicorp.com/vault/docs/platform/k8s/vso/csi)
+* [HCP Terraform Dynamic Credentials](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/dynamic-provider-credentials)
+* [Vault JWT Auth Method](https://developer.hashicorp.com/vault/docs/auth/jwt)
 <!-- END_TF_DOCS -->
