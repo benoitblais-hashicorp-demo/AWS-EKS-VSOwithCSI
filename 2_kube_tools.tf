@@ -46,31 +46,11 @@ resource "kubernetes_namespace_v1" "ingress_nginx" {
 # NGINX INGRESS CONTROLLER & LOAD BALANCING
 # ------------------------------------------------------------------------------
 
-# 3. Provision static AWS Elastic IPs to attach to the Network Load Balancer (NLB)
-resource "aws_eip" "nginx_ingress" {
-  count = var.step_2 ? 3 : 0
-  depends_on = [
-    time_sleep.step_2,
-    kubernetes_namespace_v1.demo_app,
-  ]
-}
-
-# 4. Wait temporarily to let AWS API cleanly allocate the EIPs before Helm uses them
-resource "time_sleep" "eip_wait" {
-  count = var.step_2 ? 1 : 0
-  depends_on = [
-    time_sleep.step_2,
-    aws_eip.nginx_ingress,
-  ]
-  destroy_duration = "60s"
-}
-
-# 5. Deploy the NGINX Ingress Controller mapped to an AWS NLB using the static EIPs
+# 3. Deploy the NGINX Ingress Controller mapped to a dynamic AWS NLB
 resource "helm_release" "nginx_ingress" {
   count = var.step_2 ? 1 : 0
   depends_on = [
     time_sleep.step_2,
-    time_sleep.eip_wait,
     kubernetes_namespace_v1.ingress_nginx,
   ]
   name            = "ingress-nginx"
@@ -89,13 +69,24 @@ controller:
       ${var.public_hosted_zone != "" ? format("service.beta.kubernetes.io/aws-load-balancer-ssl-cert: \"%s\"", try(aws_acm_certificate_validation.public[0].certificate_arn, "")) : "# TLS disabled"}
       ${var.public_hosted_zone != "" ? "service.beta.kubernetes.io/aws-load-balancer-ssl-ports: \"443\"" : ""}
       service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: true
-      service.beta.kubernetes.io/aws-load-balancer-eip-allocations: ${aws_eip.nginx_ingress[0].id},${aws_eip.nginx_ingress[1].id},${aws_eip.nginx_ingress[2].id}
       service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
     type: LoadBalancer
 defaultBackend:
   enabled: true
 EOT
+  ]
+}
+
+# 4. Fetch the dynamically generated NGINX Ingress Controller service hostname
+data "kubernetes_service_v1" "nginx_ingress" {
+  count = var.step_2 ? 1 : 0
+  metadata {
+    name      = "ingress-nginx-controller"
+    namespace = kubernetes_namespace_v1.ingress_nginx[0].metadata.0.name
+  }
+  depends_on = [
+    helm_release.nginx_ingress
   ]
 }
 
