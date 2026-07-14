@@ -34,7 +34,7 @@ This document describes the technical architecture, deployment sequence, and des
           │  namespaces: demo-go-web-vso-csi,        │
           │              ingress-nginx, uptycs       │
           │  ┌────────────────────────────────────┐  │
-          │  │  helm: ingress-nginx (NLB + EIP)   │  │
+          │  │  helm: ingress-nginx (NLB)         │  │
           │  │  helm: k8sosquery (Uptycs EDR)     │  │
           │  │  helm: vault-secrets-operator      │  │
           │  │    └─ CSI provider enabled         │  │
@@ -91,7 +91,6 @@ Resources provisioned:
 | Resource | Description |
 | --- | --- |
 | `kubernetes_namespace_v1.demo_app` | Dedicated namespaces (`demo-go-web-vso-csi`, `ingress-nginx`, `uptycs`) with PSS compliance |
-| `aws_eip.nginx_ingress` | 3 Elastic IPs for the Network Load Balancer |
 | `helm_release.nginx_ingress` | Nginx ingress controller (internet-facing NLB) |
 | `helm_release.uptycs_edr` | IBM Uptycs EDR agent (k8sosquery Helm chart) |
 | `helm_release.vault_secrets_operator` | VSO Helm chart v1.3.0 with CSI driver enabled |
@@ -124,12 +123,12 @@ After Step 3, the web application is accessible via the Elastic IP and renders V
 
 ### Ingress Architecture
 
-The nginx ingress controller is deployed with an internet-facing AWS Network Load Balancer (NLB). Three Elastic IPs are pre-allocated and associated with the NLB via `service.beta.kubernetes.io/aws-load-balancer-eip-allocations`. This ensures a stable, predictable public IP for the demo application.
+The nginx ingress controller is deployed with a dynamically generated internet-facing AWS Network Load Balancer (NLB). To mitigate static EIP quota limits (`AddressLimitExceeded`), the Route 53 `CNAME` record maps the DNS domain directly to the AWS-assigned NLB hostname.
 
 Traffic flow:
 
 ```text
-Internet → Elastic IP (NLB) → nginx ingress controller → demo-go-web-vso-csi service → pod (port 8080)
+Internet → CNAME (Route53) → Dynamic Hostname (NLB) → nginx ingress controller → demo-go-web-vso-csi service → pod (port 8080)
 ```
 
 ### EKS Cluster Networking

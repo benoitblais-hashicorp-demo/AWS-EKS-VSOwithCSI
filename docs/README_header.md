@@ -22,7 +22,7 @@ provider — without ever storing them as Kubernetes `Secret` objects.
 
 - **AWS Networking:** VPC with private/public subnets across multiple Availability Zones, Internet Gateway, and NAT-based outbound connectivity for EKS worker nodes.
 - **Compute:** EKS cluster (v1.34) with a managed node group (t3.medium, 1–3 nodes) and core addons (CoreDNS, kube-proxy, VPC CNI, EKS Pod Identity Agent).
-- **Ingress:** Nginx ingress controller backed by an internet-facing AWS Network Load Balancer (NLB) with 3 pre-allocated Elastic IPs.
+- **Ingress:** Nginx ingress controller backed by a dynamically generated, internet-facing AWS Network Load Balancer (NLB). Route 53 DNS uses a CNAME record mapped directly to the dynamic NLB hostname to mitigate static Elastic IP (EIP) quota limits.
 - **Vault:** Isolated namespace, KV v2 mount (`webapp`), and static secret (`webapp/app/config`). Contains the Kubernetes auth backend wired to the EKS cluster using service account token review, plus required roles and policies.
 - **Vault Secrets Operator (VSO):** Helm release v1.3.0 deployed with the CSI provider driver side-car enabled (`csi.enabled: true`).
 - **Kubernetes Workload & RBAC:** Includes the Go web application deployment (`demo-webapp`, 3 replicas), ClusterIP service, and ingress rule. Configures a `vault-auth` service account, long-lived token secret, and `system:auth-delegator` cluster role binding.

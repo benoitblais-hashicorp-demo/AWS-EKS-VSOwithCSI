@@ -65,13 +65,12 @@ resource "aws_acm_certificate_validation" "public" {
 # APPLICATION DNS MAPPING
 # ------------------------------------------------------------------------------
 
-# 5. Map the public demo subdomain directly to the pre-allocated NGINX Ingress Elastic IPs
+# 5. Map the public demo subdomain to the dynamic AWS NLB via a CNAME record
 resource "aws_route53_record" "web_dns_record" {
   count   = var.step_2 && var.public_hosted_zone != "" ? 1 : 0
   zone_id = data.aws_route53_zone.demo[0].zone_id
   name    = "${var.demo_subdomain}.${var.public_hosted_zone}"
-  type    = "A"
+  type    = "CNAME"
   ttl     = 300
-  # Directly resolving the pre-allocated EIPs attached to the NLB!
-  records = aws_eip.nginx_ingress[*].public_ip
+  records = [data.kubernetes_service_v1.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname]
 }

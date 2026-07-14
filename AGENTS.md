@@ -87,6 +87,10 @@ When editing or creating `docs/README_footer.md`, ensure it contains:
 
 Refer to CONTRIBUTING.md for general coding guidelines. HashiCorp's Terraform style guide should be applied for all code generated.
 
+## Architectural Constraints & Migitations
+
+- **AWS Elastic IPs:** Do not provision static `aws_eip` resources for the Ingress controller to avoid AWS `AddressLimitExceeded` quota errors. Instead, configure the NGINX Ingress controller to use a dynamically generated AWS Network Load Balancer (NLB) and map a Route 53 `CNAME` record to its hostname.
+
 ## Resource Naming
 
 - Use descriptive nouns separated by underscores.
