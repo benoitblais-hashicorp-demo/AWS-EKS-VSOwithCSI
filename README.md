@@ -23,7 +23,7 @@ provider — without ever storing them as Kubernetes `Secret` objects.
 
 - **AWS Networking:** VPC with private/public subnets across multiple Availability Zones, Internet Gateway, and NAT-based outbound connectivity for EKS worker nodes.
 - **Compute:** EKS cluster (v1.34) with a managed node group (t3.medium, 1–3 nodes) and core addons (CoreDNS, kube-proxy, VPC CNI, EKS Pod Identity Agent).
-- **Ingress:** Nginx ingress controller backed by an internet-facing AWS Network Load Balancer (NLB) with 3 pre-allocated Elastic IPs.
+- **Ingress:** Nginx ingress controller backed by a dynamically generated, internet-facing AWS Network Load Balancer (NLB). Route 53 DNS uses a CNAME record mapped directly to the dynamic NLB hostname to mitigate static Elastic IP (EIP) quota limits.
 - **Vault:** Isolated namespace, KV v2 mount (`webapp`), and static secret (`webapp/app/config`). Contains the Kubernetes auth backend wired to the EKS cluster using service account token review, plus required roles and policies.
 - **Vault Secrets Operator (VSO):** Helm release v1.3.0 deployed with the CSI provider driver side-car enabled (`csi.enabled: true`).
 - **Kubernetes Workload & RBAC:** Includes the Go web application deployment (`demo-webapp`, 3 replicas), ClusterIP service, and ingress rule. Configures a `vault-auth` service account, long-lived token secret, and `system:auth-delegator` cluster role binding.
@@ -177,10 +177,19 @@ Once the application is running, here is how you can explain the integration flo
    - **What to say:** Highlight the `values.yaml` configuration mapping where the CSI driver is enabled natively (`csi.enabled: true`).
 4. **CSISecrets Custom Resource (`3_kube_static_app.tf`)**:
    - **Where:** Terraform codebase (`3_kube_static_app.tf`).
-   - **What to say:** Since the AWS EKS Console doesn't natively display Custom Resource instances, show the `kubernetes_manifest.vault_csi_secret` block directly in your editor. Point out the `mount: webapp` and `path: app/config` mappings. Explain to the audience that this is the developer-facing manifest: they simply define this custom resource to tell the CSI driver exactly which Vault secret to fetch, without needing to know any Vault API logic.
+   - **What to say:** Since the AWS EKS Console doesn't natively display Custom
+     Resource instances, show the `kubernetes_manifest.vault_csi_secret` block directly
+     in your editor. Point out the `mount: webapp` and `path: app/config` mappings.
+     Explain to the audience that this is the developer-facing manifest: they simply
+     define this custom resource to tell the CSI driver exactly which Vault secret
+     to fetch, without needing to know any Vault API logic.
 5. **Pod Volume Mount (`3_kube_static_app.tf`)**:
    - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Workloads → Pods → Select a `demo-webapp` pod → YAML / Raw view.
-   - **What to say:** Scroll down to the `spec.containers.volumeMounts` block to highlight where the application mounts the ephemeral directory (`/var/run/secrets/vault`). Then, scroll down to the `spec.volumes` block to show how that specific volume is backed directly by the `csi.vso.hashicorp.com` driver rather than a standard Kubernetes Secret.
+   - **What to say:** Scroll down to the `spec.containers.volumeMounts` block to
+     highlight where the application mounts the ephemeral directory (`/var/run/secrets/vault`).
+     Then, scroll down to the `spec.volumes` block to show how that specific volume
+     is backed directly by the `csi.vso.hashicorp.com` driver rather than a standard
+     Kubernetes Secret.
 6. **No Kubernetes Secrets Generated**:
    - **Where:** AWS Console → EKS → Clusters → `<resources_prefix>-<random_id>-eks` → Resources → Config and secrets.
    - **What to say:** Filter by the `demo-go-web-vso-csi` namespace. Prove to the audience that there are **no application secret objects** stored here. The only secrets present are standard Kubernetes service account tokens. The actual application secret remains entirely ephemeral.
@@ -339,9 +348,16 @@ Documentation:
 
 ## Troubleshooting & Known Issues
 
-- **Vault Enterprise Validation Errors:** The VSO CSI driver requires Vault Enterprise to function and hard-validates this requirement by querying the `/sys/license/status` endpoint. If your pod's Vault policy does not grant `read` capability to this endpoint, the volume mount will throw a `vault enterprise client validation failed` error, completely blocking Pod scheduling.
-- **Invalid Audience / Issuer Claims:** When mapping the Vault Kubernetes Auth backend against an EKS cluster, avoid hardcoding the `audience = "vault"` constraint on the role and set `disable_iss_validation = true` on the backend config. Short-lived CSI volume tokens generated natively by EKS often omit specific audiences and rotate dynamic OIDC issuers, causing 403 Forbidden errors if strict matching is enforced.
-- **Vault 403 Permission Denied during Token Review:** When mapping the Vault Kubernetes Auth backend inside an HCP Vault dedicated namespace, ensure that the `VaultAuth` custom resource refers to the Vault namespace using the **Namespace ID** instead of the FQDN path. Using the full namespace path generates a 403 error due to token evaluation logic.
+- **Vault Enterprise Validation Errors:** The VSO CSI driver requires Vault Enterprise to function and hard-validates this
+  requirement by querying the `/sys/license/status` endpoint. If your pod's Vault policy does not grant `read` capability
+  to this endpoint, the volume mount will throw a `vault enterprise client validation failed` error, completely blocking Pod scheduling.
+- **Invalid Audience / Issuer Claims:** When mapping the Vault Kubernetes Auth backend against an EKS cluster, avoid hardcoding
+  the `audience = "vault"` constraint on the role and set `disable_iss_validation = true` on the backend config. Short-lived
+  CSI volume tokens generated natively by EKS often omit specific audiences and rotate dynamic OIDC issuers, causing 403 Forbidden
+  errors if strict matching is enforced.
+- **Vault 403 Permission Denied during Token Review:** When mapping the Vault Kubernetes Auth backend inside an HCP Vault
+  dedicated namespace, ensure that the `VaultAuth` custom resource refers to the Vault namespace using the **Namespace ID**
+  instead of the FQDN path. Using the full namespace path generates a 403 error due to token evaluation logic.
 
 ## Documentation
 
@@ -551,7 +567,6 @@ The following resources are used by this module:
 
 - [aws_acm_certificate.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) (resource)
 - [aws_acm_certificate_validation.public](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) (resource)
-- [aws_eip.nginx_ingress](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) (resource)
 - [aws_route53_record.public_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) (resource)
 - [aws_route53_record.web_dns_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) (resource)
 - [helm_release.nginx_ingress](https://registry.terraform.io/providers/hashicorp/helm/3.1.1/docs/resources/release) (resource)
@@ -572,7 +587,6 @@ The following resources are used by this module:
 - [kubernetes_service_account_v1.vault](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/service_account_v1) (resource)
 - [kubernetes_service_v1.demo_webapp](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/resources/service_v1) (resource)
 - [random_string.identifier](https://registry.terraform.io/providers/hashicorp/random/3.8.1/docs/resources/string) (resource)
-- [time_sleep.eip_wait](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
 - [time_sleep.step_2](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
 - [time_sleep.step_3](https://registry.terraform.io/providers/hashicorp/time/0.13.1/docs/resources/sleep) (resource)
 - [vault_auth_backend.kube_auth](https://registry.terraform.io/providers/hashicorp/vault/5.8.0/docs/resources/auth_backend) (resource)
@@ -588,6 +602,7 @@ The following resources are used by this module:
 - [aws_iam_session_context.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_session_context) (data source)
 - [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) (data source)
 - [aws_route53_zone.demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) (data source)
+- [kubernetes_service_v1.nginx_ingress](https://registry.terraform.io/providers/hashicorp/kubernetes/3.0.1/docs/data-sources/service_v1) (data source)
 
 ## Outputs
 
